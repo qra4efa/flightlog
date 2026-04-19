@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FlightLog 1.6</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@400;600;700;900&display=swap');
+:root{
+  --bg:#090d18;--panel:#0d1424;--border:#1a2848;
+  --accent:#00d4f0;--green:#00e87a;--red:#ff2040;
+  --yellow:#ffc800;--orange:#ff7a00;--blue:#3b7fff;
+  --text:#b8cef0;--muted:#38506a;
+  --header-h:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100dvh;overflow-x:hidden;}
+
+/* HEADLINE */
+.app-headline{
+  background:var(--panel);border-bottom:1px solid var(--border);
+  text-align:center;padding:6px 12px 5px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;
+  color:var(--muted);text-transform:uppercase;
+  position:sticky;top:0;z-index:102;
+}
+.app-headline .ver{color:var(--accent);font-weight:700;}
+
+/* NAV */
+.nav-tabs{position:sticky;top:27px;z-index:101;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:stretch;height:var(--header-h);padding:0 4px;gap:2px;}
+.nav-tab{flex:1;border:none;background:transparent;color:var(--muted);font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:4px;}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.nav-tab .badge{background:var(--accent);color:#000;border-radius:10px;font-size:9px;font-weight:900;padding:1px 5px;}
+
+/* PAGES */
+.page{display:none;padding:10px 11px 100px;max-width:600px;margin:0 auto;}
+.page.active{display:block;}
+
+/* SECTION TITLE */
+.stitle{font-size:9px;font-weight:700;letter-spacing:3.5px;color:var(--accent);text-transform:uppercase;margin:16px 0 6px;display:flex;align-items:center;gap:8px;}
+.stitle::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent);}
+.stitle:first-child{margin-top:4px;}
+
+/* CARD */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:11px;margin-bottom:8px;}
+
+/* FIELD — label fuori dal box */
+.field{margin-bottom:10px;}
+.field:last-child{margin-bottom:0;}
+label{display:block;font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+
+input[type=text],input[type=number],input[type=date],input[type=time],textarea{
+  width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);font-family:'Share Tech Mono',monospace;font-size:14px;
+  padding:8px 10px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;
+}
+input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,212,240,.12);}
+input.warn-low {border-color:var(--red)!important;color:var(--red)!important;}
+input.warn-high{border-color:var(--orange)!important;color:var(--orange)!important;}
+textarea{resize:vertical;min-height:58px;font-size:13px;}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+
+/* CARROZZELLA — compatta + data + ora sulla stessa riga */
+/* col: carrozzella(fixed) | data | ora */
+.id-top{display:grid;grid-template-columns:110px 1fr 110px;gap:5px;align-items:end;margin-bottom:9px;}
+
+/* MONO/BIPO + NICK */
+.seat-toggle{display:flex;border-radius:6px;overflow:hidden;border:1px solid var(--border);}
+.seat-btn{flex:1;padding:8px 6px;font-size:10px;font-weight:700;letter-spacing:.5px;background:var(--bg);color:var(--muted);border:none;cursor:pointer;font-family:'Exo 2',sans-serif;transition:all .15s;}
+.seat-btn.am{background:rgba(0,212,240,.18);color:var(--accent);}
+.seat-btn.ab{background:rgba(255,122,0,.18);color:var(--orange);}
+
+/* PILLS */
+.pill-row{display:flex;gap:5px;flex-wrap:nowrap;}
+.pill{flex:1;border:none;border-radius:6px;padding:8px 2px;font-size:11px;font-weight:700;background:var(--bg);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Exo 2',sans-serif;text-align:center;}
+.pill.active{background:rgba(0,212,240,.18);border-color:var(--accent);color:var(--accent);}
+
+/* OPT PILLS 3-state */
+.opt-pill-row{display:flex;gap:5px;flex-wrap:nowrap;}
+.opt-pill{flex:1;border:none;border-radius:6px;padding:7px 2px;font-size:10px;font-weight:700;background:var(--bg);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Exo 2',sans-serif;text-align:center;}
+.opt-pill.st-ok {background:rgba(0,232,122,.2);border-color:var(--green);color:var(--green);}
+.opt-pill.st-off{background:rgba(255,32,64,.2);border-color:var(--red);color:var(--red);}
+
+/* MLG pills */
+.mlg-row{display:flex;gap:5px;margin-bottom:7px;}
+.mlg-pill{flex:1;border:none;border-radius:6px;padding:7px 2px;font-size:9px;font-weight:700;background:var(--bg);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Exo 2',sans-serif;text-align:center;}
+.mlg-pill.active{background:rgba(0,212,240,.18);border-color:var(--accent);color:var(--accent);}
+
+/* FUEL input colors */
+input.fuel-res{color:var(--orange)!important;border-color:rgba(255,122,0,.35)!important;}
+input.fuel-tot{color:var(--green)!important;border-color:rgba(0,232,122,.35)!important;}
+input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!important;}
+/* fuel tag compact */
+.fuel-compact{display:flex;gap:6px;margin-top:7px;}
+.fuel-tag{flex:1;border-radius:6px;padding:6px 7px;font-family:'Share Tech Mono',monospace;font-size:12px;display:flex;flex-direction:column;gap:2px;align-items:center;}
+.fuel-tag .ft-lbl{font-size:8px;color:var(--muted);letter-spacing:.5px;}
+.fuel-tag .ft-val{font-size:14px;font-weight:700;}
+.fuel-tag.internal{background:rgba(0,212,240,.07);border:1px solid rgba(0,212,240,.2);}
+.fuel-tag.internal .ft-val{color:var(--accent);}
+.fuel-tag.external{background:rgba(255,122,0,.07);border:1px solid rgba(255,122,0,.2);}
+.fuel-tag.external .ft-val{color:var(--orange);}
+
+/* CALC ROW */
+.calc-row{display:flex;gap:5px;margin-top:7px;}
+.ibox{border-radius:6px;padding:7px 8px;font-family:'Share Tech Mono',monospace;font-size:12px;display:flex;flex-direction:column;gap:2px;align-items:center;flex:1;}
+.ibox .lbl{font-size:8px;color:var(--muted);letter-spacing:.3px;white-space:nowrap;}
+.ibox strong{font-size:13px;}
+.ibox.warn  {background:rgba(255,200,0,.07);border:1px solid rgba(255,200,0,.28);color:var(--yellow);}
+.ibox.redbox{background:rgba(255,32,64,.10);border:1px solid rgba(255,32,64,.4);color:var(--red);}
+.ibox.blue  {background:rgba(0,212,240,.06);border:1px solid rgba(0,212,240,.2);color:var(--accent);}
+
+/* GO/NOGO 4-col grid */
+.gn-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;}
+.gn-item{display:flex;flex-direction:column;gap:3px;}
+.gn-lbl{font-size:8px;font-weight:700;letter-spacing:.8px;color:var(--muted);text-transform:uppercase;text-align:center;padding:2px 0;}
+.gn-btn{width:100%;border:none;border-radius:5px;padding:8px 2px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Exo 2',sans-serif;transition:all .15s;}
+.gn-btn.go  {background:rgba(0,232,122,.15);border:1px solid rgba(0,232,122,.3);color:var(--green);}
+.gn-btn.nogo{background:rgba(255,32,64,.06);border:1px solid rgba(255,32,64,.15);color:#4a2838;}
+.gn-btn.nogo.active{background:rgba(255,32,64,.25);border:1px solid var(--red);color:var(--red);box-shadow:0 0 6px rgba(255,32,64,.3);}
+.gn-btn.astina{background:rgba(59,127,255,.06);border:1px solid rgba(59,127,255,.2);color:#2a4070;}
+.gn-btn.astina.active{background:rgba(59,127,255,.28);border-color:var(--blue);color:var(--blue);box-shadow:0 0 6px rgba(59,127,255,.3);}
+
+/* HYD wrap */
+.hyd-wrap{position:relative;}
+.hyd-unit{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--muted);pointer-events:none;font-family:'Share Tech Mono',monospace;}
+
+/* ALERTS */
+.o2-alert{margin-top:5px;padding:5px 9px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.5px;display:none;text-transform:uppercase;}
+.o2-alert.red{display:block;background:rgba(255,32,64,.18);color:var(--red);border:1px solid var(--red);}
+
+/* COND */
+.cond{display:none;}
+.cond.show{display:block;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-5px);}to{opacity:1;transform:translateY(0);}}
+.note{font-size:9px;color:var(--muted);letter-spacing:.3px;margin-top:4px;}
+
+/* BOTTOM BAR */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:8px 11px;display:flex;gap:6px;max-width:600px;margin:0 auto;}
+.btn{flex:1;border:none;border-radius:8px;padding:11px 5px;font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+.btn-primary {background:var(--accent);color:#000;}
+.btn-primary:active{transform:scale(.97);}
+.btn-secondary{background:transparent;color:var(--accent);border:1px solid var(--border);}
+.btn-secondary:active{background:rgba(0,212,240,.08);}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(255,32,64,.3);}
+.btn-danger:active{background:rgba(255,32,64,.08);}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.82);align-items:flex-end;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:16px 16px 0 0;padding:18px 13px 36px;width:100%;max-width:600px;margin:0 auto;max-height:85dvh;overflow-y:auto;}
+.modal-title{font-size:12px;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:13px;text-transform:uppercase;}
+.preview-block{background:var(--bg);border-radius:8px;padding:11px;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.85;white-space:pre-wrap;color:var(--text);margin-bottom:8px;border:1px solid var(--border);}
+.preview-block b{font-size:15px;color:#fff;letter-spacing:.5px;}
+/* share link box */
+.share-link-box{background:rgba(0,212,240,.06);border:1px solid rgba(0,212,240,.25);border-radius:7px;padding:9px 11px;margin-bottom:13px;display:flex;align-items:center;gap:8px;cursor:pointer;}
+.share-link-box .link-ico{font-size:15px;flex-shrink:0;}
+.share-link-box .link-url{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);word-break:break-all;flex:1;line-height:1.4;}
+.share-link-box .link-copy{font-size:9px;color:var(--muted);flex-shrink:0;white-space:nowrap;}
+.modal-btns{display:flex;gap:7px;}
+
+/* ARCHIVE */
+.arch-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;}
+.arch-item{background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:11px;margin-bottom:7px;cursor:pointer;transition:border-color .15s;display:flex;align-items:center;gap:9px;}
+.arch-item:active{border-color:var(--accent);}
+.arch-item.foreign{border-left:3px solid var(--orange);}
+.arch-meta{flex:1;min-width:0;}
+.arch-date{font-size:11px;color:var(--muted);font-family:'Share Tech Mono',monospace;}
+.arch-main{font-size:14px;font-weight:700;color:var(--text);font-family:'Share Tech Mono',monospace;margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.arch-sub{font-size:10px;color:var(--muted);letter-spacing:.5px;}
+.arch-ico{font-size:17px;flex-shrink:0;}
+.arch-actions{display:flex;gap:5px;flex-shrink:0;}
+.arch-btn{border:none;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;}
+.arch-btn:hover{color:var(--accent);}
+.arch-btn.del:hover{color:var(--red);}
+.search-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:13px;padding:8px 10px;outline:none;margin-bottom:9px;transition:border-color .2s;}
+.search-input:focus{border-color:var(--accent);}
+.import-area{width:100%;background:var(--bg);border:1px dashed var(--border);border-radius:8px;padding:11px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;min-height:110px;outline:none;resize:vertical;transition:border-color .2s;}
+.import-area:focus{border-color:var(--accent);}
+/* import success banner */
+.import-banner{display:none;background:rgba(0,232,122,.12);border:1px solid var(--green);border-radius:8px;padding:10px 13px;color:var(--green);font-size:12px;font-weight:700;margin-bottom:10px;}
+.import-banner.show{display:block;}
+</style>
+</head>
+<body>
+
+<div class="app-headline">Consumabili EFA — skappa <span class="ver">2.2</span></div>
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="showPage('form')" id="tab-form">✏ Compila</button>
+  <button class="nav-tab" onclick="showPage('archive')" id="tab-archive">🗂 Archivio <span class="badge" id="arch-badge">0</span></button>
+  <button class="nav-tab" onclick="showPage('import')" id="tab-import">📥 Importa</button>
+</div>
+
+<!-- ══════════ FORM PAGE ══════════ -->
+<div class="page active" id="page-form">
+
+  <div class="stitle">Identificazione</div>
+  <div class="card">
+    <!-- Riga 1: Carrozzella | Data | Ora -->
+    <div class="id-top">
+      <div class="field" style="margin-bottom:0">
+        <label>Carr.</label>
+        <input type="text" id="f-carr" placeholder="› 4-xx" autocomplete="off" inputmode="text" maxlength="7" style="font-size:14px;letter-spacing:1px;text-align:left;padding-left:6px;">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Data (gg-mm-aa)</label>
+        <input type="text" id="f-data" placeholder="28-04-25" inputmode="numeric" maxlength="8" autocomplete="off">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Ora</label>
+        <input type="time" id="f-ora">
+      </div>
+    </div>
+    <!-- Riga 2: MONO/BIPO + Nick -->
+    <div class="row2" style="margin-bottom:9px">
+      <div class="field" style="margin-bottom:0">
+        <label>Config.</label>
+        <div class="seat-toggle">
+          <button class="seat-btn am" id="btn-mono" onclick="setSeat('mono')">MONO</button>
+          <button class="seat-btn"    id="btn-bipo" onclick="setSeat('bipo')">BIPO</button>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Nick</label>
+        <input type="text" id="f-nick" placeholder="es. Mario" autocomplete="off" oninput="saveNick()">
+      </div>
+    </div>
+    <!-- Tipo ispezione -->
+    <div class="field">
+      <label>Ispezione</label>
+      <div class="pill-row">
+        <button class="pill" onclick="setTipo('BF')"   id="pill-BF">BF</button>
+        <button class="pill" onclick="setTipo('TF')"   id="pill-TF">TF</button>
+        <button class="pill" onclick="setTipo('AF')"   id="pill-AF">AF</button>
+        <button class="pill" onclick="setTipo('CPPF')" id="pill-CPPF">CPPF</button>
+        <button class="pill" onclick="setTipo('IOT')"  id="pill-IOT">IOT</button>
+        <button class="pill" onclick="setTipo('WA')"   id="pill-WA">WA</button>
+      </div>
+    </div>
+    <!-- Opzioni -->
+    <div class="field" style="margin-bottom:0">
+      <label>Maintenance</label>
+      <div class="opt-pill-row">
+        <button class="opt-pill" id="opt-AMC"   onclick="cycleOpt('AMC')">AMC</button>
+        <button class="opt-pill" id="opt-134"   onclick="cycleOpt('134')">134</button>
+        <button class="opt-pill" id="opt-265"   onclick="cycleOpt('265')">265</button>
+        <button class="opt-pill" id="opt-Para"  onclick="cycleOpt('Para')">Para</button>
+        <button class="opt-pill" id="opt-Ruota" onclick="cycleOpt('Ruota')">Ruota</button>
+        <button class="opt-pill" id="opt-BSD"   onclick="cycleOpt('BSD')">BSD</button>
+      </div>
+      <!-- Para sub-fields -->
+      <div class="cond" id="para-fields" style="margin-top:8px">
+        <div class="row2">
+          <div class="field" style="margin-bottom:0">
+            <label>Para — Rimosso</label>
+            <input type="text" id="f-para-rim" placeholder="—" autocomplete="off">
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>Para — Installato</label>
+            <input type="text" id="f-para-inst" placeholder="—" autocomplete="off">
+          </div>
+        </div>
+      </div>
+      <!-- Ruota sub-fields -->
+      <div class="cond" id="ruota-fields" style="margin-top:8px">
+        <div class="mlg-row">
+          <button class="mlg-pill" id="mlg-NLG"   onclick="toggleMLG('NLG')">NLG</button>
+          <button class="mlg-pill" id="mlg-LHMLG" onclick="toggleMLG('LHMLG')">LH MLG</button>
+          <button class="mlg-pill" id="mlg-RHMLG" onclick="toggleMLG('RHMLG')">RH MLG</button>
+        </div>
+        <div id="ruota-sub-rows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARBURANTE -->
+  <div class="stitle">Carburante</div>
+  <div class="card">
+    <!-- Labels fuori, 3 campi affiancati -->
+    <div class="row3" style="margin-bottom:0">
+      <div class="field" style="margin-bottom:0">
+        <label style="color:var(--orange)">KG Rimanente</label>
+        <input type="text" id="f-res" placeholder="0" inputmode="decimal" class="fuel-res" autocomplete="off">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label style="color:var(--green)">KG Totale</label>
+        <input type="text" id="f-tot" placeholder="0" inputmode="decimal" class="fuel-tot" autocomplete="off">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label style="color:var(--yellow)">Litri botte</label>
+        <input type="text" id="f-litri" placeholder="0" inputmode="decimal" class="fuel-lit" autocomplete="off">
+      </div>
+    </div>
+    <!-- Breakdown fusoliera/esterne -->
+    <div id="fuel-compact" style="display:none" class="fuel-compact">
+      <div class="fuel-tag internal"><span class="ft-lbl">FUSOLIERA</span><span class="ft-val" id="ft-fus">—</span></div>
+      <div class="fuel-tag external" id="ft-ext-tag" style="display:none"><span class="ft-lbl" id="ft-ext-lbl">TANICHE</span><span class="ft-val" id="ft-ext">—</span></div>
+    </div>
+    <!-- Calcoli su una riga -->
+    <div class="calc-row">
+      <div class="ibox warn"><span class="lbl">Calcolati</span><strong id="calc-dkg">—</strong></div>
+      <div class="ibox warn"><span class="lbl">Misurati ×0,78</span><strong id="calc-bkg">—</strong></div>
+      <div class="ibox" id="scarto-box" style="display:none"><span class="lbl">Scarto</span><strong id="calc-sc">—</strong></div>
+    </div>
+  </div>
+
+  <!-- LIVELLO SISTEMI -->
+  <div class="stitle">Livello Sistemi</div>
+  <div class="card">
+    <div class="gn-grid">
+      <div>
+        <div class="gn-item"><div class="gn-lbl">LH GBox</div><button class="gn-btn go" id="gn-gb-sx" onclick="cycleGN('gb-sx')">GO</button></div>
+        <div style="height:5px"></div>
+        <div class="gn-item"><div class="gn-lbl">RH GBox</div><button class="gn-btn go" id="gn-gb-dx" onclick="cycleGN('gb-dx')">GO</button></div>
+      </div>
+      <div>
+        <div class="gn-item"><div class="gn-lbl">GEN 1</div><button class="gn-btn go" id="gn-gen-sx" onclick="cycleGN('gen-sx')">GO</button></div>
+        <div style="height:5px"></div>
+        <div class="gn-item"><div class="gn-lbl">GEN 2</div><button class="gn-btn go" id="gn-gen-dx" onclick="cycleGN('gen-dx')">GO</button></div>
+      </div>
+      <div>
+        <div class="gn-item"><div class="gn-lbl">LH ENG</div><button class="gn-btn go" id="gn-eng-sx" onclick="cycleGN('eng-sx')">GO</button></div>
+        <div style="height:5px"></div>
+        <div class="gn-item"><div class="gn-lbl">RH ENG</div><button class="gn-btn go" id="gn-eng-dx" onclick="cycleGN('eng-dx')">GO</button></div>
+      </div>
+      <div>
+        <div class="gn-item"><div class="gn-lbl">Astina LH</div><button class="gn-btn astina" id="gn-ast-lh" onclick="cycleAstina('ast-lh')">—</button></div>
+        <div style="height:5px"></div>
+        <div class="gn-item"><div class="gn-lbl">Astina RH</div><button class="gn-btn astina" id="gn-ast-rh" onclick="cycleAstina('ast-rh')">—</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HYD · PAO · OXY -->
+  <div class="stitle">Idraulica · PAO · OXY</div>
+  <div class="card">
+    <div class="row2" style="margin-bottom:9px">
+      <div class="field" style="margin-bottom:0">
+        <label>HYD 1</label>
+        <div class="hyd-wrap"><input type="text" id="f-hyd-sx" placeholder="00.0" inputmode="decimal" oninput="checkHyd('f-hyd-sx')"><span class="hyd-unit">L</span></div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>HYD 2</label>
+        <div class="hyd-wrap"><input type="text" id="f-hyd-dx" placeholder="00.0" inputmode="decimal" oninput="checkHyd('f-hyd-dx')"><span class="hyd-unit">L</span></div>
+      </div>
+    </div>
+    <div class="note" style="margin-bottom:9px">HYD: avviso &lt;10.0 rosso · &gt;12.0 arancio</div>
+    <div class="row2" style="margin-bottom:0">
+      <div class="field" style="margin-bottom:0">
+        <label>PAO</label>
+        <input type="text" id="f-pao" placeholder="0.00" inputmode="decimal" oninput="checkPAO()">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>OXY fwd</label>
+        <input type="text" id="f-oxy-fwd" placeholder="0" inputmode="decimal" oninput="checkOxy('f-oxy-fwd','oxy-alert-fwd')">
+      </div>
+    </div>
+    <div class="o2-alert" id="pao-alert">⚠ PAO fuori range (0,37–1,03)</div>
+    <div class="o2-alert" id="oxy-alert-fwd">⚠ OXY fwd sotto 200 L</div>
+    <div class="cond" id="oxy-bipo-block" style="margin-top:8px">
+      <div class="field" style="margin-bottom:0">
+        <label>OXY aft</label>
+        <input type="text" id="f-oxy-aft" placeholder="0" inputmode="decimal" oninput="checkOxy('f-oxy-aft','oxy-alert-aft')">
+      </div>
+      <div class="o2-alert" id="oxy-alert-aft">⚠ OXY aft sotto 200 L</div>
+    </div>
+  </div>
+
+  <!-- EXTRA TF/AF/IOT -->
+  <div class="cond" id="extra-fields">
+    <div class="stitle">Oggetti a Vita Indipendente</div>
+    <div class="card">
+      <!-- GB SX, GB DX, APU sulla stessa riga -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 70px;gap:6px;margin-bottom:10px">
+        <div class="field" style="margin-bottom:0">
+          <label>GB SX</label>
+          <input type="text" id="f-gbox-sx" placeholder="0000.00" inputmode="decimal">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>GB DX</label>
+          <input type="text" id="f-gbox-dx" placeholder="0000.00" inputmode="decimal">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>APU</label>
+          <input type="number" id="f-apu" placeholder="0" inputmode="numeric" step="1" min="0">
+        </div>
+      </div>
+      <!-- LH Hip / RH Hip -->
+      <div class="row2">
+        <div class="field" style="margin-bottom:0">
+          <label>LH Hip</label>
+          <input type="text" id="f-hip-lh" placeholder="00000" inputmode="numeric" maxlength="5">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>RH Hip</label>
+          <input type="text" id="f-hip-rh" placeholder="00000" inputmode="numeric" maxlength="5">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTE -->
+  <div class="stitle">Note</div>
+  <div class="card">
+    <textarea id="f-note" placeholder="Note libere…"></textarea>
+  </div>
+
+</div><!-- /page-form -->
+
+<!-- ══════════ ARCHIVE PAGE ══════════ -->
+<div class="page" id="page-archive">
+  <div style="padding-top:8px">
+    <input type="text" class="search-input" id="arch-search" placeholder="Cerca carrozzella / tipo / nick…" oninput="renderArchive()">
+    <div id="arch-list"><div class="arch-empty">Nessuna scheda salvata</div></div>
+  </div>
+</div>
+
+<!-- ══════════ IMPORT PAGE ══════════ -->
+<div class="page" id="page-import">
+  <div class="import-banner" id="import-banner"></div>
+  <div class="stitle">Importa da collega</div>
+  <div class="card">
+    <div class="field" style="margin-bottom:9px">
+      <label>Incolla il testo ricevuto</label>
+      <textarea class="import-area" id="import-area" placeholder="Incolla qui il testo condiviso da un collega…"></textarea>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="doImport()">📥 Importa scheda</button>
+  </div>
+  <div class="stitle">Come funziona</div>
+  <div class="card" style="color:var(--muted);font-size:12px;line-height:1.7">
+    Quando un collega condivide una scheda, ricevi un messaggio con il testo leggibile e un blocco JSON.<br>
+    Copia il blocco JSON (tutto il testo da <span style="color:var(--accent)">{</span> a <span style="color:var(--accent)">}</span>) e incollalo qui sopra.<br>
+    Le schede di colleghi appaiono con bordo <span style="color:var(--orange)">arancio</span> e icona ✈.
+  </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar" id="form-bar">
+  <button class="btn btn-danger"    onclick="resetForm()">Reset</button>
+  <button class="btn btn-secondary" onclick="saveRecord()">💾 Salva</button>
+  <button class="btn btn-primary"   onclick="openShare()">✈ Condividi</button>
+</div>
+
+<!-- MODAL SHARE -->
+<div class="modal-overlay" id="modal-share">
+  <div class="modal">
+    <div class="modal-title">📋 Condividi scheda</div>
+    <div class="preview-block" id="share-preview" style="max-height:220px;overflow-y:auto;"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <!-- Bottone 1: testo plain (per chi non ha l'app) -->
+      <button class="btn btn-secondary" style="flex:1;font-size:10px;letter-spacing:1px" onclick="shareText()">
+        📄 Testo<br><span style="font-size:8px;opacity:.6">per tutti</span>
+      </button>
+      <!-- Bottone 2: link con dati (apre l'app e importa) -->
+      <button class="btn btn-primary" style="flex:1;font-size:10px;letter-spacing:1px" onclick="shareLink()">
+        🔗 Link app<br><span style="font-size:8px;opacity:.7">apre &amp; importa</span>
+      </button>
+    </div>
+    <div id="share-link-display" style="display:none;margin-top:8px">
+      <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">Link generato — tocca per selezionare e copia</div>
+      <textarea id="share-link-ta" readonly onclick="this.select()" style="width:100%;background:var(--bg);border:1px solid rgba(0,212,240,.3);border-radius:6px;color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:10px;padding:8px;resize:none;height:58px;outline:none;word-break:break-all;"></textarea>
+      <button class="btn btn-secondary" style="width:100%;margin-top:6px;font-size:10px" onclick="copyLinkTA()">📋 Copia link</button>
+    </div>
+    <button class="btn btn-secondary" style="width:100%;margin-top:8px" onclick="closeModal('modal-share')">Chiudi</button>
+  </div>
+</div>
+
+<!-- MODAL ARCHIVE DETAIL -->
+<div class="modal-overlay" id="modal-arch">
+  <div class="modal">
+    <div class="modal-title" id="arch-modal-title">Scheda</div>
+    <div class="preview-block" id="arch-modal-body"></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('modal-arch')">Chiudi</button>
+      <button class="btn btn-secondary" style="flex:1" onclick="editRecord()">✏ Modifica</button>
+      <button class="btn btn-primary"   style="flex:2" onclick="shareArchItem()">✈ Condividi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  COSTANTI
+// ══════════════════════════════════════════
+const TANK_EXT   = 750;
+const FUS_MONO   = 4980;
+const FUS_BIPO   = 4300;
+const FUEL_DENS  = 0.78;
+const SCARTO_MAX = 2.0;
+const APP_VER    = '1.7';
+
+const GN_FIELDS = ['gb-sx','gb-dx','gen-sx','gen-dx','eng-sx','eng-dx'];
+const GN_LABELS = {'gb-sx':'LH GBox','gb-dx':'RH GBox','gen-sx':'GEN 1','gen-dx':'GEN 2','eng-sx':'LH ENG','eng-dx':'RH ENG'};
+const OPT_KEYS  = ['AMC','134','265','Para','Ruota','BSD'];
+const MLG_KEYS  = ['NLG','LHMLG','RHMLG'];
+const MLG_LABELS= {'NLG':'NLG','LHMLG':'LH MLG','RHMLG':'RH MLG'};
+
+// ══════════════════════════════════════════
+//  STATO
+// ══════════════════════════════════════════
+let seatConfig   = 'mono';
+let tipoSel      = '';
+let gnState      = {};
+let asitinaState = {};
+let optState     = {};
+let mlgActive    = {};
+let archivio     = [];
+let currentArchIdx = null;
+let _shareData   = null; // dati correnti per share link
+
+// ══════════════════════════════════════════
+//  INIT — gestisce auto-import da URL
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  const n = new Date();
+  const dd=String(n.getDate()).padStart(2,'0');
+  const mm=String(n.getMonth()+1).padStart(2,'0');
+  const yy=String(n.getFullYear()).slice(-2);
+  document.getElementById('f-data').value = `${dd}-${mm}-${yy}`;
+  document.getElementById('f-ora').value  = n.toTimeString().slice(0,5);
+  const nick = localStorage.getItem('flightlog_nick')||'';
+  document.getElementById('f-nick').value = nick;
+  loadArchivio();
+  updateBadge();
+  tryAutoImport();
+});
+
+// Auto-formato data gg-mm-aa: aggiunge trattini automaticamente
+document.getElementById('f-data').addEventListener('input', function(e){
+  // Permetti cancellazione senza riformattare
+  const sel = this.selectionStart;
+  let digits = this.value.replace(/[^0-9]/g,'');
+  let result = digits;
+  if(digits.length >= 3) result = digits.slice(0,2)+'-'+digits.slice(2);
+  if(digits.length >= 5) result = result.slice(0,5)+'-'+digits.slice(4,6);
+  if(this.value !== result) this.value = result.slice(0,8);
+});
+
+// ══════════════════════════════════════════
+//  AUTO-IMPORT DA URL
+// ══════════════════════════════════════════
+function tryAutoImport(){
+  const params = new URLSearchParams(window.location.search);
+  const enc = params.get('d');
+  if(!enc) return;
+  try{
+    const json = JSON.parse(decodeURIComponent(atob(enc)));
+    if(!json || !json.carr) return;
+    json.foreign = true;
+    json.id = json.id || Date.now();
+    // rimuovi il param dall'URL senza ricaricare
+    const cleanUrl = window.location.href.split('?')[0];
+    window.history.replaceState({}, '', cleanUrl);
+    // verifica duplicati
+    if(archivio.find(a=>a.id===json.id)){
+      showImportBanner('ℹ Scheda già presente in archivio.', false);
+      showPage('archive'); return;
+    }
+    archivio.unshift(json);
+    archivio.sort((a,b)=>(b.data+b.ora).localeCompare(a.data+a.ora));
+    saveArchivio();
+    showImportBanner(`✅ Importata: ${json.carr} — ${json.tipo} — ${json.data}`, true);
+    showPage('archive');
+  } catch(e){ /* link malformato, ignora */ }
+}
+
+function showImportBanner(msg, ok){
+  const el = document.getElementById('import-banner');
+  el.textContent = msg;
+  el.style.background = ok ? 'rgba(0,232,122,.12)' : 'rgba(0,212,240,.08)';
+  el.style.borderColor = ok ? 'var(--green)' : 'var(--accent)';
+  el.style.color = ok ? 'var(--green)' : 'var(--accent)';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 5000);
+}
+
+// ══════════════════════════════════════════
+//  BUILD SHARE LINK — JSON compresso per import
+//  (il link URL con ?d= non funziona su file locali/statici;
+//   sostituiamo con testo JSON che il collega incolla nella tab Importa)
+// ══════════════════════════════════════════
+function buildSharePayload(d){
+  // versione minimal dei dati per ridurre la dimensione
+  return JSON.stringify(d);
+}
+
+function copyShareLink(){
+  const payload=document.getElementById('share-link-url').textContent;
+  navigator.clipboard.writeText(payload).then(()=>{
+    document.querySelector('.link-copy').textContent='✓ Copiato!';
+    setTimeout(()=>{ document.querySelector('.link-copy').textContent='Copia JSON'; }, 2500);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=payload;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    document.querySelector('.link-copy').textContent='✓ Copiato!';
+    setTimeout(()=>{ document.querySelector('.link-copy').textContent='Copia JSON'; }, 2500);
+  });
+}
+
+// ══════════════════════════════════════════
+//  NAVIGAZIONE
+// ══════════════════════════════════════════
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  document.getElementById('form-bar').style.display = name==='form'?'flex':'none';
+  if(name==='archive') renderArchive();
+}
+
+// ══════════════════════════════════════════
+//  NICK
+// ══════════════════════════════════════════
+function saveNick(){
+  localStorage.setItem('flightlog_nick', document.getElementById('f-nick').value);
+}
+
+// ══════════════════════════════════════════
+//  CARROZZELLA AUTO-TRATTINO
+// ══════════════════════════════════════════
+const PREFIXES = ['51','37','36','4'];
+document.getElementById('f-carr').addEventListener('input', function(){
+  let raw = this.value.replace(/[^0-9xX\-]/g,'');
+  // se inizia con X → velivolo esterno, nessun trattino
+  if(raw.toUpperCase().startsWith('X')){ this.value = raw.toUpperCase(); return; }
+  let digits = raw.replace(/[^0-9]/g,'');
+  let result = digits;
+  for(const p of PREFIXES){
+    if(digits.startsWith(p) && digits.length > p.length){
+      result = p + '-' + digits.slice(p.length); break;
+    }
+  }
+  if(this.value !== result) this.value = result;
+});
+
+// ══════════════════════════════════════════
+//  MONO/BIPO
+// ══════════════════════════════════════════
+function setSeat(mode){
+  seatConfig = mode;
+  document.getElementById('btn-mono').className = 'seat-btn'+(mode==='mono'?' am':'');
+  document.getElementById('btn-bipo').className = 'seat-btn'+(mode==='bipo'?' ab':'');
+  const bp = document.getElementById('oxy-bipo-block');
+  mode==='bipo' ? bp.classList.add('show') : bp.classList.remove('show');
+  calcFuel();
+}
+
+// ══════════════════════════════════════════
+//  TIPO ISPEZIONE
+// ══════════════════════════════════════════
+function setTipo(t){
+  tipoSel = t;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pill-'+t).classList.add('active');
+  const extra = document.getElementById('extra-fields');
+  ['TF','AF','IOT'].includes(t) ? extra.classList.add('show') : extra.classList.remove('show');
+}
+
+// ══════════════════════════════════════════
+//  OPT PILLS
+// ══════════════════════════════════════════
+function cycleOpt(key){
+  const cur = optState[key]||0;
+  // BSD ha solo 2 stati attivi: 1=inst(verde), 2=rim(rosso)
+  // Gli altri hanno 3 stati: 0=off, 1=ok(verde), 2=off(rosso)
+  const next = (cur+1)%3;
+  optState[key] = next;
+  const btn = document.getElementById('opt-'+key);
+  if(key==='BSD'){
+    // Stato 1 = INST (verde), Stato 2 = RIM (rosso), Stato 0 = opaco
+    btn.className = 'opt-pill'+(next===1?' st-ok':next===2?' st-off':'');
+    btn.textContent = next===1?'BSD inst': next===2?'BSD rim':'BSD';
+  } else {
+    btn.className = 'opt-pill'+(next===1?' st-ok':next===2?' st-off':'');
+  }
+  if(key==='Para'){
+    const pf=document.getElementById('para-fields');
+    next>0 ? pf.classList.add('show') : pf.classList.remove('show');
+  }
+  if(key==='Ruota'){
+    const rf=document.getElementById('ruota-fields');
+    next>0 ? rf.classList.add('show') : rf.classList.remove('show');
+    if(next===0){ mlgActive={}; updateMLGPills(); renderRuotaRows(); }
+  }
+}
+
+// ══════════════════════════════════════════
+//  MLG
+// ══════════════════════════════════════════
+function toggleMLG(key){
+  mlgActive[key]=!mlgActive[key];
+  updateMLGPills(); renderRuotaRows();
+}
+function updateMLGPills(){
+  MLG_KEYS.forEach(k=>{ const b=document.getElementById('mlg-'+k); if(b) b.className='mlg-pill'+(mlgActive[k]?' active':''); });
+}
+function renderRuotaRows(){
+  const cont=document.getElementById('ruota-sub-rows');
+  const active=MLG_KEYS.filter(k=>mlgActive[k]);
+  if(!active.length){ cont.innerHTML=''; return; }
+  cont.innerHTML=active.map(k=>`
+    <div style="margin-bottom:7px">
+      <div class="note" style="margin-bottom:4px;color:var(--accent);letter-spacing:1px">${MLG_LABELS[k]}</div>
+      <div class="row2">
+        <div class="field" style="margin-bottom:0"><label>Rimosso</label><input type="text" id="f-ruota-${k}-rim" placeholder="—" autocomplete="off"></div>
+        <div class="field" style="margin-bottom:0"><label>Installato</label><input type="text" id="f-ruota-${k}-inst" placeholder="—" autocomplete="off"></div>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+//  GO/NOGO + ASTINA
+// ══════════════════════════════════════════
+function cycleGN(field){
+  const cur=gnState[field]||'GO';
+  const next=cur==='GO'?'NOGO':'GO';
+  gnState[field]=next;
+  const btn=document.getElementById('gn-'+field);
+  if(next==='NOGO'){btn.textContent='NO-GO';btn.className='gn-btn nogo active';}
+  else{btn.textContent='GO';btn.className='gn-btn go';}
+}
+function cycleAstina(key){
+  asitinaState[key]=!asitinaState[key];
+  const btn=document.getElementById('gn-'+key);
+  if(asitinaState[key]){btn.textContent='OK';btn.className='gn-btn astina active';}
+  else{btn.textContent='—';btn.className='gn-btn astina';}
+}
+
+// ══════════════════════════════════════════
+//  AUTO-FORMAT HYD  (3 digit → XX.X)
+// ══════════════════════════════════════════
+['f-hyd-sx','f-hyd-dx'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', function(){
+    if(this.value.includes('.')) return;
+    const raw=this.value.replace(/[^0-9]/g,'');
+    if(raw.length>=3) this.value=raw.slice(0,raw.length-1)+'.'+raw.slice(-1);
+    checkHyd(id);
+  });
+});
+
+// ══════════════════════════════════════════
+//  AUTO-FORMAT PAO  (after first digit → 0.xx)
+// ══════════════════════════════════════════
+document.getElementById('f-pao').addEventListener('input', function(){
+  if(this.value.includes('.')) return;
+  const raw=this.value.replace(/[^0-9]/g,'');
+  if(raw.length>=2) this.value=raw[0]+'.'+raw.slice(1);
+  checkPAO();
+});
+
+// ══════════════════════════════════════════
+//  AUTO-FORMAT GBOX
+//  Durante la digitazione: inserisce il punto dopo le cifre delle ore
+//  (le ultime 2 cifre sono sempre i quarti d'ora → punto 2 pos da destra)
+//  Esempi: 1915→19.15  12330→123.30  345600→3456.00
+//  Al blur: converte decimali centesimali in esagesimali
+//  .25→.15  .50→.30  .75→.45
+// ══════════════════════════════════════════
+['f-gbox-sx','f-gbox-dx'].forEach(id=>{
+  const el=document.getElementById(id);
+
+  el.addEventListener('keydown', function(e){
+    this._deleting=(e.key==='Backspace'||e.key==='Delete');
+  });
+
+  el.addEventListener('input', function(){
+    // Se si sta cancellando, non riformattare
+    if(this._deleting){ this._deleting=false; return; }
+    // Estrai solo le cifre (rimuovi punti già presenti)
+    const raw=this.value.replace(/[^0-9]/g,'');
+    if(raw.length===0){ this.value=''; return; }
+    if(raw.length<=2){ this.value=raw; return; }
+    // Punto 2 cifre da destra: 1915→19.15  12330→123.30  345600→3456.00
+    this.value=raw.slice(0,raw.length-2)+'.'+raw.slice(-2);
+  });
+
+  el.addEventListener('blur', function(){
+    if(!this.value) return;
+    // Se ancora senza punto (utente ha scritto <=2 cifre), aggiungi .00
+    if(!this.value.includes('.')){
+      const raw=this.value.replace(/[^0-9]/g,'');
+      this.value=(parseInt(raw)||0)+'.00';
+      return;
+    }
+    // Converti parte decimale centesimale→esagesimale
+    const parts=this.value.split('.');
+    const intVal=parseInt(parts[0])||0;
+    let dec=parseInt((parts[1]||'00').padEnd(2,'0').slice(0,2));
+    const map={0:0,15:15,25:15,30:30,45:45,50:30,75:45};
+    if(map[dec]!==undefined) dec=map[dec];
+    else if(dec<8) dec=0;
+    else if(dec<23) dec=15;
+    else if(dec<38) dec=30;
+    else dec=45;
+    this.value=intVal+'.'+String(dec).padStart(2,'0');
+  });
+});
+
+// ══════════════════════════════════════════
+//  CARBURANTE CALC
+// ══════════════════════════════════════════
+function calcFuel(){
+  const res   = parseFloat(document.getElementById('f-res').value)  ||0;
+  const tot   = parseFloat(document.getElementById('f-tot').value)  ||0;
+  const litri = parseFloat(document.getElementById('f-litri').value)||0;
+  const dkg   = tot-res;
+  document.getElementById('calc-dkg').textContent=(res||tot)?dkg.toFixed(0):'—';
+  const bkg=litri*FUEL_DENS;
+  document.getElementById('calc-bkg').textContent=litri?bkg.toFixed(0):'—';
+
+  const sBox=document.getElementById('scarto-box');
+  if((res||tot)&&litri&&dkg!==0){
+    const sp=(dkg-bkg)/dkg*100;
+    document.getElementById('calc-sc').textContent=(sp>=0?'+':'')+sp.toFixed(1)+'%';
+    sBox.style.display='flex';
+    sBox.className='ibox '+(Math.abs(sp)>SCARTO_MAX?'redbox':'green');
+  } else sBox.style.display='none';
+
+  const compact=document.getElementById('fuel-compact');
+  if(tot>0){
+    compact.style.display='flex';
+    const base=seatConfig==='bipo'?FUS_BIPO:FUS_MONO;
+    const over=tot-base;
+    let nT=over>350?Math.max(0,Math.min(3,Math.round(over/TANK_EXT))):0;
+    const kExt=nT*TANK_EXT, kFus=tot-kExt;
+    document.getElementById('ft-fus').textContent=kFus.toFixed(0);
+    const extTag=document.getElementById('ft-ext-tag');
+    if(nT>0){extTag.style.display='flex';document.getElementById('ft-ext-lbl').textContent=nT+'× TANK';document.getElementById('ft-ext').textContent=kExt.toFixed(0);}
+    else extTag.style.display='none';
+  } else compact.style.display='none';
+}
+['f-res','f-tot','f-litri'].forEach(id=>document.getElementById(id).addEventListener('input',calcFuel));
+
+// ══════════════════════════════════════════
+//  CHECKS
+// ══════════════════════════════════════════
+function checkHyd(id){
+  const v=parseFloat(document.getElementById(id).value);
+  const el=document.getElementById(id);
+  el.classList.remove('warn-low','warn-high');
+  if(!isNaN(v)){if(v<10.0)el.classList.add('warn-low');else if(v>12.0)el.classList.add('warn-high');}
+}
+function checkPAO(){
+  const v=parseFloat(document.getElementById('f-pao').value);
+  const el=document.getElementById('f-pao'),al=document.getElementById('pao-alert');
+  el.classList.remove('warn-low','warn-high');
+  if(!isNaN(v)){
+    if(v<0.37){el.classList.add('warn-low');al.classList.add('red');}
+    else if(v>1.03){el.classList.add('warn-high');al.classList.add('red');}
+    else al.classList.remove('red');
+  } else al.classList.remove('red');
+}
+function checkOxy(inputId,alertId){
+  const v=parseFloat(document.getElementById(inputId).value);
+  const al=document.getElementById(alertId),el=document.getElementById(inputId);
+  if(!isNaN(v)&&v<200){al.classList.add('red');el.classList.add('warn-low');}
+  else{al.classList.remove('red');el.classList.remove('warn-low');}
+}
+
+// ══════════════════════════════════════════
+//  RACCOLTA DATI
+// ══════════════════════════════════════════
+function collectData(){
+  const G=id=>{const e=document.getElementById(id);return e?e.value:null;};
+  const res=parseFloat(G('f-res'))||0,tot=parseFloat(G('f-tot'))||0,litri=parseFloat(G('f-litri'))||0;
+  const base=seatConfig==='bipo'?FUS_BIPO:FUS_MONO;
+  const over=tot-base;
+  let nT=over>350?Math.max(0,Math.min(3,Math.round(over/TANK_EXT))):0;
+  const kExt=nT*TANK_EXT,kFus=tot-kExt;
+  const dkg=tot-res,bkg=litri*FUEL_DENS;
+  const sc=(dkg&&litri)?((dkg-bkg)/dkg*100):null;
+  const ruotaData={};
+  MLG_KEYS.filter(k=>mlgActive[k]).forEach(k=>{
+    ruotaData[k]={rim:G('f-ruota-'+k+'-rim')||'',inst:G('f-ruota-'+k+'-inst')||''};
+  });
+  return{
+    id:Date.now(),foreign:false,
+    nick:G('f-nick'),data:G('f-data'),ora:G('f-ora'),
+    carr:G('f-carr'),seat:seatConfig,tipo:tipoSel,
+    opts:{...optState},
+    paraRim:G('f-para-rim'),paraInst:G('f-para-inst'),
+    ruotaData,mlgActive:{...mlgActive},
+    res,tot,kFus:tot>0?kFus:null,kExt:tot>0&&nT>0?kExt:null,nTaniche:nT,
+    litri,dkg:(res||tot)?dkg:null,bkg:litri?bkg:null,sc,
+    gn:{...gnState},astina:{...asitinaState},
+    hydSx:G('f-hyd-sx'),hydDx:G('f-hyd-dx'),
+    pao:G('f-pao'),oxyFwd:G('f-oxy-fwd'),oxyAft:seatConfig==='bipo'?G('f-oxy-aft'):null,
+    gboxSx:G('f-gbox-sx'),gboxDx:G('f-gbox-dx'),
+    hipLh:G('f-hip-lh'),hipRh:G('f-hip-rh'),
+    apu:G('f-apu'),
+    note:G('f-note')
+  };
+}
+
+// ══════════════════════════════════════════
+//  BUILD TESTO — HTML con valori in bold
+//  Formato: VALORE - descrizione
+// ══════════════════════════════════════════
+function buildText(d){
+  const N=v=>v!==null&&v!==undefined&&v!==''&&v!=='—'&&v!==0&&v!=='0';
+  const B=v=>`<b>${v}</b>`;    // valore in grassetto
+  const W=v=>` ⚠`;             // warning symbol
+  let t='';
+
+  // ── HEADER ──
+  const seat=(d.seat||'mono')==='bipo'?'BIPO':'MONO';
+  t+=`${B(d.carr||'?')} ${B(d.tipo||'?')} - ${seat}`;
+  if(N(d.nick)) t+=`  [${d.nick}]`;
+  t+=`\n${d.data||'?'} ${d.ora||'?'}\n`;
+
+  // ── OPT (solo quelli attivi) ──
+  const optParts=[];
+  OPT_KEYS.forEach(k=>{
+    const v=(d.opts||{})[k]||0;
+    if(k==='BSD'){
+      if(v===1) optParts.push(`${B('BSD inst')}`);
+      else if(v===2) optParts.push(`${B('BSD rim ⚠')}`);
+    } else {
+      if(v===1) optParts.push(`${B(k+' OK')}`);
+      else if(v===2) optParts.push(`${B(k+' OFF ⚠')}`);
+    }
+  });
+  if(optParts.length) t+=optParts.join('  ')+'\n';
+
+  // Para
+  const pSt=(d.opts||{})['Para']||0;
+  if(pSt>0){
+    const pv=pSt===1?'OK':'OFF ⚠';
+    t+=`${B('Para '+pv)}`;
+    if(N(d.paraRim)) t+=`  Rim ${B(d.paraRim)}`;
+    if(N(d.paraInst)) t+=`  Inst ${B(d.paraInst)}`;
+    t+='\n';
+  }
+
+  // Ruota — solo righe con inst valorizzato, niente header "Ruota:OK"
+  const rSt=(d.opts||{})['Ruota']||0;
+  if(rSt>0){
+    const rd=d.ruotaData||{};
+    let hasRuota=false;
+    Object.keys(rd).forEach(k=>{
+      if(rd[k].inst && rd[k].inst.trim()){
+        hasRuota=true;
+        const lbl=MLG_LABELS[k]||k;
+        const rStatus=rSt===1?'OK':'OFF ⚠';
+        t+=`${B(lbl+' '+rStatus)}`;
+        if(rd[k].rim && rd[k].rim.trim()) t+=`  Rim ${B(rd[k].rim)}`;
+        t+=`  Inst ${B(rd[k].inst)}\n`;
+      }
+    });
+    // Se nessuna ruota con inst, almeno mostra lo stato
+    if(!hasRuota) t+=`${B('Ruota '+(rSt===1?'OK':'OFF'))}\n`;
+  }
+
+  // ── CARBURANTE ──
+  t+='\n';
+  t+=`${B(d.res||0)} - kg RES\n`;
+  t+=`${B(d.tot||0)} - kg TOT\n`;
+  if(N(d.kFus)) t+=`${B(Math.round(d.kFus))} - kg FUS\n`;
+  if(N(d.kExt)) t+=`${B(Math.round(d.kExt))} - kg EXT ×${d.nTaniche}\n`;
+  t+='\n';
+  if(N(d.litri)) t+=`${B(d.litri)} - BOTTE L\n`;
+  if(N(d.dkg)) t+=`${B(Math.round(d.dkg))} - kg Calcolati\n`;
+  if(N(d.bkg)) t+=`${B(Math.round(d.bkg))} - kg Misurati 0,78\n`;
+  if(N(d.sc)){
+    const scOk=Math.abs(d.sc)<=SCARTO_MAX;
+    t+=`${B(d.sc.toFixed(1)+'%')} - Scarto${scOk?'':' ⚠'}\n`;
+  }
+
+  // ── SISTEMI ──
+  t+='\n';
+  const nogos=GN_FIELDS.filter(f=>(d.gn||{})[f]==='NOGO');
+  const astLH=!!(d.astina||{})['ast-lh'];
+  const astRH=!!(d.astina||{})['ast-rh'];
+  if(nogos.length===0 && !astLH && !astRH){
+    t+=`${B('GO')} - SYS\n`;
+  } else {
+    const sysMap={};
+    GN_FIELDS.forEach(f=>{ if((d.gn||{})[f]==='NOGO') sysMap[GN_LABELS[f]]='NO-GO ⚠'; });
+    const sysLines=Object.entries(sysMap).map(([k,v])=>{
+      let line=`${B(v)} - ${k}`;
+      if(k==='LH ENG' && astLH) line+=`  Astina ${B('OK')}`;
+      if(k==='RH ENG' && astRH) line+=`  Astina ${B('OK')}`;
+      return line;
+    });
+    if(astLH && !sysMap['LH ENG']) sysLines.push(`${B('GO')} - LH ENG  Astina ${B('OK')}`);
+    if(astRH && !sysMap['RH ENG']) sysLines.push(`${B('GO')} - RH ENG  Astina ${B('OK')}`);
+    if(sysLines.length) t+=sysLines.join('\n')+'\n';
+  }
+
+  // ── HYD ──
+  if(N(d.hydSx)||N(d.hydDx)){
+    const h1=parseFloat(d.hydSx), h2=parseFloat(d.hydDx);
+    const w1=!isNaN(h1)&&(h1<10||h1>12)?'⚠':'';
+    const w2=!isNaN(h2)&&(h2<10||h2>12)?'⚠':'';
+    t+='\n';
+    if(N(d.hydSx)) t+=`${B(d.hydSx)}${w1} - HYD 1\n`;
+    if(N(d.hydDx)) t+=`${B(d.hydDx)}${w2} - HYD 2\n`;
+  }
+
+  // ── PAO ──
+  if(N(d.pao)){
+    const pv=parseFloat(d.pao);
+    const pw=!isNaN(pv)&&(pv<0.37||pv>1.03)?'⚠':'';
+    t+=`${B(d.pao)}${pw} - PAO\n`;
+  }
+
+  // ── OXY ──
+  if(N(d.oxyFwd)){
+    const ov=parseFloat(d.oxyFwd);
+    t+=`${B(d.oxyFwd)}${!isNaN(ov)&&ov<200?'⚠':''} - OXY fwd\n`;
+  }
+  if(N(d.oxyAft)){
+    const oa=parseFloat(d.oxyAft);
+    t+=`${B(d.oxyAft)}${!isNaN(oa)&&oa<200?'⚠':''} - OXY aft\n`;
+  }
+
+  // ── OVI (Oggetti a Vita Indipendente) ──
+  if(['TF','AF','IOT'].includes(d.tipo)){
+    if(N(d.gboxSx)||N(d.gboxDx)||N(d.hipLh)||N(d.hipRh)||N(d.apu)){
+      t+='\n';
+      if(N(d.gboxSx)) t+=`${B(d.gboxSx)} - GB SX\n`;
+      if(N(d.gboxDx)) t+=`${B(d.gboxDx)} - GB DX\n`;
+      if(N(d.hipLh))  t+=`${B(d.hipLh)} - LH Hip\n`;
+      if(N(d.hipRh))  t+=`${B(d.hipRh)} - RH Hip\n`;
+      if(N(d.apu))    t+=`${B(d.apu)} - APU acc\n`;
+    }
+  }
+
+  // ── NOTE ──
+  if(N(d.note)) t+=`\n${d.note}\n`;
+
+  return t.trim();
+}
+
+// Versione plain-text per condivisione WhatsApp (senza tag HTML)
+function buildTextPlain(d){
+  return buildText(d).replace(/<b>/g,'').replace(/<\/b>/g,'');
+}
+
+// ══════════════════════════════════════════
+//  ARCHIVIO
+// ══════════════════════════════════════════
+function loadArchivio(){
+  try{archivio=JSON.parse(localStorage.getItem('flightlog_arch')||'[]');}
+  catch(e){archivio=[];}
+  updateBadge();
+}
+function saveArchivio(){
+  localStorage.setItem('flightlog_arch',JSON.stringify(archivio));
+  updateBadge();
+}
+function updateBadge(){document.getElementById('arch-badge').textContent=archivio.length;}
+
+function saveRecord(){
+  const d=collectData();
+  // Validazione con messaggio specifico
+  const missing=[];
+  if(!d.carr || d.carr.trim()==='') missing.push('Carrozzella');
+  if(!d.tipo || d.tipo.trim()==='') missing.push('Tipo ispezione');
+  if(!d.data || d.data.trim()==='') missing.push('Data');
+  if(missing.length){
+    alert('⚠ Campi obbligatori mancanti:\n• '+missing.join('\n• '));
+    return;
+  }
+  // Fingerprint: carr + tipo + data + ora (identifica univocamente una scheda)
+  const fp = `${d.carr}|${d.tipo}|${d.data}|${d.ora}`;
+  d._fp = fp;
+  d.id = Date.now();
+  // Controlla duplicato esatto (stessa scheda già salvata da noi, non da colleghi)
+  const dupIdx = archivio.findIndex(a => a._fp===fp && !a.foreign);
+  if(dupIdx >= 0){
+    const conf = confirm(`Una scheda identica (${d.carr} ${d.tipo} ${d.data} ${d.ora}) è già in archivio.\nVuoi sovrascriverla?`);
+    if(!conf) return;
+    d.id = archivio[dupIdx].id; // mantieni stesso id
+    archivio[dupIdx] = d;
+  } else {
+    archivio.unshift(d);
+  }
+  archivio.sort((a,b)=>(b.data+b.ora).localeCompare(a.data+a.ora));
+  saveArchivio();
+  alert(`✅ Salvata! (${d.carr} ${d.tipo} ${d.data})\nArchivio: ${archivio.length} schede`);
+}
+
+function renderArchive(){
+  const q=(document.getElementById('arch-search').value||'').toLowerCase();
+  const el=document.getElementById('arch-list');
+  const fil=archivio.filter(d=>(d.carr||'').toLowerCase().includes(q)||(d.tipo||'').toLowerCase().includes(q)||(d.nick||'').toLowerCase().includes(q));
+  if(!fil.length){el.innerHTML='<div class="arch-empty">Nessun risultato</div>';return;}
+  el.innerHTML=fil.map(d=>{
+    const oi=archivio.indexOf(d);
+    const nogos=GN_FIELDS.filter(f=>(d.gn||{})[f]==='NOGO');
+    const status=nogos.length?`<span style="color:var(--red);font-weight:700">${nogos.length} NOGO</span>`:'<span style="color:var(--green)">GO</span>';
+    const nickTag=d.nick?` · <span style="color:var(--accent)">${d.nick}</span>`:'';
+    return `<div class="arch-item ${d.foreign?'foreign':''}" onclick="viewArchItem(${oi})">
+      <div class="arch-ico">${d.foreign?'✈':'📋'}</div>
+      <div class="arch-meta">
+        <div class="arch-date">${d.data||'?'} ${d.ora||'?'}${nickTag}</div>
+        <div class="arch-main">${d.carr||'?'} — ${d.tipo||'?'}</div>
+        <div class="arch-sub">${(d.seat||'mono').toUpperCase()} · ${status}</div>
+      </div>
+      <div class="arch-actions">
+        <button class="arch-btn" onclick="event.stopPropagation();shareArchItemIdx(${oi})">↑</button>
+        <button class="arch-btn del" onclick="event.stopPropagation();deleteArchItem(${oi})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function viewArchItem(idx){
+  currentArchIdx=idx;
+  const d=archivio[idx];
+  document.getElementById('arch-modal-title').textContent=`${d.carr||'?'} · ${d.tipo||'?'} · ${d.data||'?'}`;
+  document.getElementById('arch-modal-body').innerHTML=buildText(d);
+  document.getElementById('modal-arch').classList.add('open');
+}
+function editRecord(){
+  closeModal('modal-arch');
+  loadIntoForm(archivio[currentArchIdx]);
+  showPage('form');
+}
+function loadIntoForm(d){
+  const S=(id,v)=>{const e=document.getElementById(id);if(e&&v!=null)e.value=v;};
+  S('f-data',d.data);S('f-ora',d.ora);S('f-carr',d.carr);S('f-nick',d.nick||'');
+  setSeat(d.seat||'mono');
+  if(d.tipo) setTipo(d.tipo);
+  S('f-res',d.res||'');S('f-tot',d.tot||'');S('f-litri',d.litri||'');
+  optState={};
+  OPT_KEYS.forEach(k=>{
+    const v=(d.opts||{})[k]||0; optState[k]=v;
+    const btn=document.getElementById('opt-'+k);
+    if(btn){
+      btn.className='opt-pill'+(v===1?' st-ok':v===2?' st-off':'');
+      if(k==='BSD') btn.textContent=v===1?'BSD inst':v===2?'BSD rim':'BSD';
+    }
+  });
+  if((d.opts||{})['Para']>0){document.getElementById('para-fields').classList.add('show');S('f-para-rim',d.paraRim);S('f-para-inst',d.paraInst);}
+  mlgActive=d.mlgActive?{...d.mlgActive}:{};
+  if((d.opts||{})['Ruota']>0){document.getElementById('ruota-fields').classList.add('show');updateMLGPills();renderRuotaRows();if(d.ruotaData) setTimeout(()=>{Object.keys(d.ruotaData).forEach(k=>{S('f-ruota-'+k+'-rim',d.ruotaData[k].rim);S('f-ruota-'+k+'-inst',d.ruotaData[k].inst);});},50);}
+  gnState={};
+  GN_FIELDS.forEach(f=>{gnState[f]=(d.gn||{})[f]||'GO';const btn=document.getElementById('gn-'+f);if(btn){if(gnState[f]==='NOGO'){btn.textContent='NO-GO';btn.className='gn-btn nogo active';}else{btn.textContent='GO';btn.className='gn-btn go';}}});
+  asitinaState=d.astina?{...d.astina}:{};
+  ['ast-lh','ast-rh'].forEach(k=>{const btn=document.getElementById('gn-'+k);if(btn){if(asitinaState[k]){btn.textContent='OK';btn.className='gn-btn astina active';}else{btn.textContent='—';btn.className='gn-btn astina';}}});
+  S('f-hyd-sx',d.hydSx);S('f-hyd-dx',d.hydDx);
+  S('f-pao',d.pao);S('f-oxy-fwd',d.oxyFwd);S('f-oxy-aft',d.oxyAft);
+  S('f-gbox-sx',d.gboxSx);S('f-gbox-dx',d.gboxDx);
+  S('f-hip-lh',d.hipLh);S('f-hip-rh',d.hipRh);
+  S('f-apu',d.apu);
+  S('f-note',d.note);
+  calcFuel();
+}
+function deleteArchItem(idx){
+  if(!confirm('Eliminare?'))return;
+  archivio.splice(idx,1);saveArchivio();renderArchive();closeModal('modal-arch');
+}
+function shareArchItemIdx(idx){currentArchIdx=idx;shareArchItem();}
+function shareArchItem(){
+  _shareData=archivio[currentArchIdx];
+  openShareModal(_shareData);
+}
+
+// ══════════════════════════════════════════
+//  CONDIVISIONE
+// ══════════════════════════════════════════
+function openShare(){
+  _shareData=collectData();
+  openShareModal(_shareData);
+}
+function openShareModal(d){
+  document.getElementById('share-preview').innerHTML=buildText(d);
+  document.getElementById('share-link-display').style.display='none';
+  document.getElementById('modal-share').classList.add('open');
+}
+
+// ── Bottone 1: condivide testo plain (leggibile da chiunque) ──
+function shareText(){
+  const text=buildTextPlain(_shareData);
+  if(navigator.share){
+    navigator.share({title:'Scheda Volo',text})
+      .catch(e=>{ if(e.name!=='AbortError') doClipboard(text,'Testo copiato!'); });
+  } else {
+    doClipboard(text,'Testo copiato negli appunti!');
+  }
+}
+
+// ── Bottone 2: genera link con dati incorporati, mostra/condivide ──
+function shareLink(){
+  const d=_shareData;
+  const json=JSON.stringify(d);
+  const enc=btoa(encodeURIComponent(json));
+  // Usa l'URL del file corrente come base (funziona quando il file è salvato sul device)
+  const base=window.location.href.split('?')[0].split('#')[0];
+  const link=`${base}?d=${enc}`;
+
+  // Mostra il link nella textarea del modal
+  const ta=document.getElementById('share-link-ta');
+  ta.value=link;
+  document.getElementById('share-link-display').style.display='block';
+
+  // Prova a condividere direttamente tramite sistema
+  if(navigator.share){
+    navigator.share({
+      title:`FlightLog - ${d.carr||'?'} ${d.tipo||'?'}`,
+      text:`Scheda volo ${d.carr||'?'} ${d.tipo||'?'} ${d.data||''}`,
+      url:link
+    }).catch(e=>{
+      if(e.name!=='AbortError'){
+        // Se share fallisce, mostra il link da copiare manualmente
+        ta.select();
+      }
+    });
+  } else {
+    // Copia link in clipboard
+    doClipboard(link,'Link copiato! Incollalo su WhatsApp.');
+    ta.select();
+  }
+}
+
+function copyLinkTA(){
+  const ta=document.getElementById('share-link-ta');
+  ta.select();
+  doClipboard(ta.value,'Link copiato!');
+}
+
+function doClipboard(text, msg){
+  navigator.clipboard.writeText(text)
+    .then(()=>{ if(msg) alert(msg); })
+    .catch(()=>{
+      try{
+        const ta=document.createElement('textarea');
+        ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+        document.body.appendChild(ta);ta.focus();ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        if(msg) alert(msg);
+      } catch(e){ alert('Copia manuale: tieni premuto sul testo → Copia'); }
+    });
+}
+
+// legacy
+function copyText(){ shareText(); }
+function copyJSON(){ doClipboard(buildSharePayload(_shareData),'JSON copiato!'); }
+function copyShareLink(){ shareLink(); }
+function fallbackCopy(text){ doClipboard(text,'Copiato!'); }
+function doShare(){ shareText(); }
+
+// ══════════════════════════════════════════
+//  IMPORT MANUALE
+// ══════════════════════════════════════════
+function doImport(){
+  // Prova prima a parsare come JSON diretto (dal link)
+  const raw=document.getElementById('import-area').value.trim();
+  if(!raw){alert('Incolla prima un testo.');return;}
+  // cerca JSON embedded nel testo (da link condiviso)
+  let d=null;
+  try{
+    const jsonMatch=raw.match(/\{.*\}/s);
+    if(jsonMatch){ d=JSON.parse(jsonMatch[0]); d.foreign=true; }
+  } catch(e){}
+  if(!d){alert('❌ Formato non riconosciuto.');return;}
+  if(archivio.find(a=>a.id===d.id)){alert('Scheda già presente.');return;}
+  archivio.unshift(d);archivio.sort((a,b)=>(b.data+b.ora).localeCompare(a.data+a.ora));
+  saveArchivio();document.getElementById('import-area').value='';
+  showImportBanner(`✅ Importata: ${d.carr} — ${d.tipo} — ${d.data}`, true);
+  showPage('archive');
+}
+
+// ══════════════════════════════════════════
+//  RESET
+// ══════════════════════════════════════════
+function resetForm(){
+  if(!confirm('Cancellare il form?'))return;
+  document.querySelectorAll('#page-form input:not(#f-nick),#page-form textarea').forEach(i=>{
+    if(i.type==='time') return;  // mantieni l'ora (type=time)
+    i.value='';
+    i.classList.remove('warn-low','warn-high');
+  });
+  const n=new Date();
+  const dd=String(n.getDate()).padStart(2,'0');
+  const mm=String(n.getMonth()+1).padStart(2,'0');
+  const yy=String(n.getFullYear()).slice(-2);
+  document.getElementById('f-data').value=`${dd}-${mm}-${yy}`;
+  document.getElementById('f-ora').value=n.toTimeString().slice(0,5);
+  // Pulisci anche il campo importa
+  const importArea=document.getElementById('import-area');
+  if(importArea) importArea.value='';
+  gnState={};
+  GN_FIELDS.forEach(f=>{const b=document.getElementById('gn-'+f);if(b){b.textContent='GO';b.className='gn-btn go';}});
+  asitinaState={};
+  ['ast-lh','ast-rh'].forEach(k=>{const b=document.getElementById('gn-'+k);if(b){b.textContent='—';b.className='gn-btn astina';}});
+  optState={};
+  OPT_KEYS.forEach(k=>{
+    const b=document.getElementById('opt-'+k);
+    if(b){ b.className='opt-pill'; if(k==='BSD') b.textContent='BSD'; }
+  });
+  mlgActive={};updateMLGPills();renderRuotaRows();
+  tipoSel='';document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  document.getElementById('extra-fields').classList.remove('show');
+  document.getElementById('para-fields').classList.remove('show');
+  document.getElementById('ruota-fields').classList.remove('show');
+  document.querySelectorAll('.o2-alert').forEach(a=>a.classList.remove('red'));
+  document.getElementById('calc-dkg').textContent='—';
+  document.getElementById('calc-bkg').textContent='—';
+  document.getElementById('scarto-box').style.display='none';
+  document.getElementById('fuel-compact').style.display='none';
+  document.getElementById('ft-ext-tag').style.display='none';
+  // ripristina classi colore carburante
+  document.getElementById('f-res').className='fuel-res';
+  document.getElementById('f-tot').className='fuel-tot';
+  document.getElementById('f-litri').className='fuel-lit';
+  setSeat('mono');
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+</script>
+</body>
+</html>
