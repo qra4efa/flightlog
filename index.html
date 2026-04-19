@@ -185,7 +185,7 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 </head>
 <body>
 
-<div class="app-headline">Consumabili EFA — skappa <span class="ver">2.2</span></div>
+<div class="app-headline">Consumabili EFA — skappa <span class="ver">2.3</span></div>
 <div class="nav-tabs">
   <button class="nav-tab active" onclick="showPage('form')" id="tab-form">✏ Compila</button>
   <button class="nav-tab" onclick="showPage('archive')" id="tab-archive">🗂 Archivio <span class="badge" id="arch-badge">0</span></button>
@@ -446,23 +446,28 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 <div class="modal-overlay" id="modal-share">
   <div class="modal">
     <div class="modal-title">📋 Condividi scheda</div>
-    <div class="preview-block" id="share-preview" style="max-height:220px;overflow-y:auto;"></div>
+    <div class="preview-block" id="share-preview" style="max-height:200px;overflow-y:auto;"></div>
     <div style="display:flex;gap:8px;margin-top:10px">
-      <!-- Bottone 1: testo plain (per chi non ha l'app) -->
-      <button class="btn btn-secondary" style="flex:1;font-size:10px;letter-spacing:1px" onclick="shareText()">
+      <button class="btn btn-secondary" style="flex:1;font-size:10px;letter-spacing:1px;line-height:1.5" onclick="shareText()">
         📄 Testo<br><span style="font-size:8px;opacity:.6">per tutti</span>
       </button>
-      <!-- Bottone 2: link con dati (apre l'app e importa) -->
-      <button class="btn btn-primary" style="flex:1;font-size:10px;letter-spacing:1px" onclick="shareLink()">
+      <button class="btn btn-primary" style="flex:1;font-size:10px;letter-spacing:1px;line-height:1.5" onclick="shareLink()">
         🔗 Link app<br><span style="font-size:8px;opacity:.7">apre &amp; importa</span>
       </button>
     </div>
-    <div id="share-link-display" style="display:none;margin-top:8px">
-      <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">Link generato — tocca per selezionare e copia</div>
-      <textarea id="share-link-ta" readonly onclick="this.select()" style="width:100%;background:var(--bg);border:1px solid rgba(0,212,240,.3);border-radius:6px;color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:10px;padding:8px;resize:none;height:58px;outline:none;word-break:break-all;"></textarea>
-      <button class="btn btn-secondary" style="width:100%;margin-top:6px;font-size:10px" onclick="copyLinkTA()">📋 Copia link</button>
+    <!-- Link testuale + QR -->
+    <div id="share-link-display" style="display:none;margin-top:10px">
+      <!-- Link textarea -->
+      <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">Link — tocca per selezionare poi Copia</div>
+      <textarea id="share-link-ta" readonly onclick="this.select()" style="width:100%;background:var(--bg);border:1px solid rgba(0,212,240,.3);border-radius:6px;color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:9px;padding:8px;resize:none;height:52px;outline:none;word-break:break-all;"></textarea>
+      <button class="btn btn-secondary" style="width:100%;margin-top:5px;font-size:10px" onclick="copyLinkTA()">📋 Copia link</button>
+      <!-- QR code -->
+      <div id="qr-section" style="display:none;margin-top:12px;text-align:center">
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase">📷 QR Code — fai scansionare al collega</div>
+        <div id="qr-container" style="display:inline-block;padding:8px;background:#090d18;border-radius:8px;border:1px solid rgba(0,212,240,.2);"></div>
+      </div>
     </div>
-    <button class="btn btn-secondary" style="width:100%;margin-top:8px" onclick="closeModal('modal-share')">Chiudi</button>
+    <button class="btn btn-secondary" style="width:100%;margin-top:10px" onclick="closeModal('modal-share')">Chiudi</button>
   </div>
 </div>
 
@@ -488,7 +493,8 @@ const FUS_MONO   = 4980;
 const FUS_BIPO   = 4300;
 const FUEL_DENS  = 0.78;
 const SCARTO_MAX = 2.0;
-const APP_VER    = '1.7';
+const APP_VER    = '2.3';
+const APP_BASE_URL = 'https://qra4efa.github.io/flightlog/';
 
 const GN_FIELDS = ['gb-sx','gb-dx','gen-sx','gen-dx','eng-sx','eng-dx'];
 const GN_LABELS = {'gb-sx':'LH GBox','gb-dx':'RH GBox','gen-sx':'GEN 1','gen-dx':'GEN 2','eng-sx':'LH ENG','eng-dx':'RH ENG'};
@@ -1183,37 +1189,55 @@ function shareText(){
   }
 }
 
-// ── Bottone 2: genera link con dati incorporati, mostra/condivide ──
+// ── Bottone 2: genera link GitHub Pages con dati incorporati + QR ──
 function shareLink(){
   const d=_shareData;
   const json=JSON.stringify(d);
   const enc=btoa(encodeURIComponent(json));
-  // Usa l'URL del file corrente come base (funziona quando il file è salvato sul device)
-  const base=window.location.href.split('?')[0].split('#')[0];
-  const link=`${base}?d=${enc}`;
+  const link=`${APP_BASE_URL}?d=${enc}`;
 
-  // Mostra il link nella textarea del modal
+  // Mostra link nella textarea
   const ta=document.getElementById('share-link-ta');
   ta.value=link;
   document.getElementById('share-link-display').style.display='block';
 
-  // Prova a condividere direttamente tramite sistema
+  // Genera QR code
+  generateQR(link);
+
+  // Prova navigator.share con URL
   if(navigator.share){
     navigator.share({
-      title:`FlightLog - ${d.carr||'?'} ${d.tipo||'?'}`,
-      text:`Scheda volo ${d.carr||'?'} ${d.tipo||'?'} ${d.data||''}`,
+      title:`FlightLog ${d.carr||'?'} ${d.tipo||'?'} ${d.data||''}`,
+      text:`✈ Scheda ${d.carr||'?'} ${d.tipo||'?'} ${d.data||''} — apri link per importare:`,
       url:link
-    }).catch(e=>{
-      if(e.name!=='AbortError'){
-        // Se share fallisce, mostra il link da copiare manualmente
-        ta.select();
-      }
-    });
+    }).catch(e=>{ if(e.name!=='AbortError') ta.select(); });
   } else {
-    // Copia link in clipboard
-    doClipboard(link,'Link copiato! Incollalo su WhatsApp.');
+    doClipboard(link,'Link copiato! Incollalo su WhatsApp — sarà cliccabile.');
     ta.select();
   }
+}
+
+function generateQR(text){
+  const section=document.getElementById('qr-section');
+  const container=document.getElementById('qr-container');
+  if(!container){ section.style.display='none'; return; }
+  // Pulisci container precedente
+  container.innerHTML='';
+  if(typeof QRCode==='undefined'){
+    section.style.display='none';
+    return;
+  }
+  section.style.display='block';
+  try{
+    new QRCode(container, {
+      text: text,
+      width: 200,
+      height: 200,
+      colorDark: '#00d4f0',
+      colorLight: '#090d18',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch(e){ section.style.display='none'; }
 }
 
 function copyLinkTA(){
@@ -1313,5 +1337,7 @@ function resetForm(){
 
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 </script>
+<!-- QRCode.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </body>
 </html>
