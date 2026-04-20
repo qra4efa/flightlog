@@ -26,14 +26,14 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-h
 }
 .app-headline .ver{color:var(--accent);font-weight:700;}
 
-/* NAV */
-.nav-tabs{position:sticky;top:27px;z-index:101;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:stretch;height:var(--header-h);padding:0 4px;gap:2px;}
-.nav-tab{flex:1;border:none;background:transparent;color:var(--muted);font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:4px;}
-.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.nav-tab .badge{background:var(--accent);color:#000;border-radius:10px;font-size:9px;font-weight:900;padding:1px 5px;}
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:102;background:var(--panel);border-top:1px solid var(--border);display:flex;align-items:stretch;height:52px;padding:0 4px;gap:2px;max-width:900px;margin:0 auto;}
+.bnav-tab{flex:1;border:none;background:transparent;color:var(--muted);font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;border-top:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:4px;}
+.bnav-tab.active{color:var(--accent);border-top-color:var(--accent);}
+.bnav-tab .badge{background:var(--accent);color:#000;border-radius:10px;font-size:9px;font-weight:900;padding:1px 5px;}
 
 /* PAGES */
-.page{display:none;padding:10px 11px 100px;max-width:600px;margin:0 auto;}
+.page{display:none;padding:10px 16px 120px;max-width:900px;margin:0 auto;}
 .page.active{display:block;}
 
 /* SECTION TITLE */
@@ -51,9 +51,11 @@ label{display:block;font-size:9px;font-weight:700;letter-spacing:1.5px;color:var
 
 input[type=text],input[type=number],input[type=date],input[type=time],textarea{
   width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;
-  color:var(--text);font-family:'Share Tech Mono',monospace;font-size:14px;
+  color:var(--text);font-family:'Share Tech Mono',monospace;font-size:16px;
   padding:8px 10px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;
 }
+/* Campi non numerici/chiave: font più piccolo */
+input[type=date],input[type=time],#f-nick,#f-data{font-size:14px;}
 input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,212,240,.12);}
 input.warn-low {border-color:var(--red)!important;color:var(--red)!important;}
 input.warn-high{border-color:var(--orange)!important;color:var(--orange)!important;}
@@ -137,7 +139,7 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 .note{font-size:9px;color:var(--muted);letter-spacing:.3px;margin-top:4px;}
 
 /* BOTTOM BAR */
-.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:8px 11px;display:flex;gap:6px;max-width:600px;margin:0 auto;}
+.bottom-bar{position:fixed;bottom:52px;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:8px 11px;display:flex;gap:6px;max-width:900px;margin:0 auto;z-index:101;}
 .btn{flex:1;border:none;border-radius:8px;padding:11px 5px;font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
 .btn-primary {background:var(--accent);color:#000;}
 .btn-primary:active{transform:scale(.97);}
@@ -152,7 +154,8 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 .modal{background:var(--panel);border:1px solid var(--border);border-radius:16px 16px 0 0;padding:18px 13px 36px;width:100%;max-width:600px;margin:0 auto;max-height:85dvh;overflow-y:auto;}
 .modal-title{font-size:12px;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:13px;text-transform:uppercase;}
 .preview-block{background:var(--bg);border-radius:8px;padding:11px;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.85;white-space:pre-wrap;color:var(--text);margin-bottom:8px;border:1px solid var(--border);}
-.preview-block b{font-size:15px;color:#fff;letter-spacing:.5px;}
+.preview-block b{font-size:17px;color:#fff;letter-spacing:.5px;}
+.preview-block s{font-size:11px;color:var(--muted);letter-spacing:.3px;text-decoration:none;font-style:normal;}
 /* share link box */
 .share-link-box{background:rgba(0,212,240,.06);border:1px solid rgba(0,212,240,.25);border-radius:7px;padding:9px 11px;margin-bottom:13px;display:flex;align-items:center;gap:8px;cursor:pointer;}
 .share-link-box .link-ico{font-size:15px;flex-shrink:0;}
@@ -185,12 +188,8 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 </head>
 <body>
 
-<div class="app-headline">Consumabili EFA — skappa <span class="ver">2.3</span></div>
-<div class="nav-tabs">
-  <button class="nav-tab active" onclick="showPage('form')" id="tab-form">✏ Compila</button>
-  <button class="nav-tab" onclick="showPage('archive')" id="tab-archive">🗂 Archivio <span class="badge" id="arch-badge">0</span></button>
-  <button class="nav-tab" onclick="showPage('import')" id="tab-import">📥 Importa</button>
-</div>
+<div class="app-headline">Consumabili EFA — skappa <span class="ver">2.6</span></div>
+
 
 <!-- ══════════ FORM PAGE ══════════ -->
 <div class="page active" id="page-form">
@@ -372,7 +371,7 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
     <div class="stitle">Oggetti a Vita Indipendente</div>
     <div class="card">
       <!-- GB SX, GB DX, APU sulla stessa riga -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 70px;gap:6px;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 90px;gap:6px;margin-bottom:10px">
         <div class="field" style="margin-bottom:0">
           <label>GB SX</label>
           <input type="text" id="f-gbox-sx" placeholder="0000.00" inputmode="decimal">
@@ -404,6 +403,16 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
   <div class="stitle">Note</div>
   <div class="card">
     <textarea id="f-note" placeholder="Note libere…"></textarea>
+  </div>
+
+  <!-- DISCLAIMER SICUREZZA -->
+  <div style="margin-top:16px;padding:12px 14px;background:rgba(0,212,240,.04);border:1px solid rgba(0,212,240,.1);border-radius:10px;">
+    <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:7px;">🔒 Sicurezza dei dati</div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.7;">
+      Tutti i dati rimangono <strong style="color:var(--text)">esclusivamente sul dispositivo</strong>, nel localStorage del browser — nessun server, nessuna trasmissione automatica.<br><br>
+      La condivisione avviene <strong style="color:var(--text)">solo su tua iniziativa esplicita</strong> tramite il sistema di messaggistica del dispositivo (WhatsApp, Signal, ecc.).<br><br>
+      Online è pubblicata <strong style="color:var(--text)">unicamente l’applicazione vuota</strong> su GitHub Pages: nessun dato operativo lascia il circuito cellulare del gruppo di lavoro. Il codice sorgente è pubblicamente ispezionabile per verificare l’assenza di telemetria.
+    </div>
   </div>
 
 </div><!-- /page-form -->
@@ -444,30 +453,43 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 
 <!-- MODAL SHARE -->
 <div class="modal-overlay" id="modal-share">
-  <div class="modal">
-    <div class="modal-title">📋 Condividi scheda</div>
-    <div class="preview-block" id="share-preview" style="max-height:200px;overflow-y:auto;"></div>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn btn-secondary" style="flex:1;font-size:10px;letter-spacing:1px;line-height:1.5" onclick="shareText()">
-        📄 Testo<br><span style="font-size:8px;opacity:.6">per tutti</span>
+  <div class="modal" style="max-width:100%;border-radius:0;max-height:100dvh;padding:14px 13px 20px;">
+    <div class="modal-title" id="share-modal-title">📋 Condividi scheda</div>
+    <div class="preview-block" id="share-preview" style="max-height:50dvh;overflow-y:auto;margin-bottom:12px;"></div>
+
+    <!-- RIGA 1: bottone principale in evidenza -->
+    <button id="share-main-btn" class="btn btn-primary" style="width:100%;font-size:13px;font-weight:900;letter-spacing:1.5px;padding:15px" onclick="shareText()">
+      ✈ CONDIVIDI SCHEDA
+    </button>
+    <div style="font-size:9px;color:var(--muted);text-align:center;margin:5px 0 12px;letter-spacing:.5px;">
+      Testo leggibile — funziona su WhatsApp, email, SMS
+    </div>
+
+    <!-- RIGA 2: bottoni secondari JSON + HTML -->
+    <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Strumenti colleghi con app</div>
+    <div style="display:flex;gap:7px;">
+      <button class="btn btn-secondary" style="flex:1;font-size:10px;padding:10px 4px;line-height:1.5" onclick="shareJSON()">
+        📦 JSON<br><span style="font-size:8px;opacity:.6;font-weight:400">importa dati</span>
       </button>
-      <button class="btn btn-primary" style="flex:1;font-size:10px;letter-spacing:1px;line-height:1.5" onclick="shareLink()">
-        🔗 Link app<br><span style="font-size:8px;opacity:.7">apre &amp; importa</span>
+      <button class="btn btn-secondary" style="flex:1;font-size:10px;padding:10px 4px;line-height:1.5" onclick="shareHTML()">
+        📱 HTML<br><span style="font-size:8px;opacity:.6;font-weight:400">invia app completa</span>
       </button>
     </div>
-    <!-- Link testuale + QR -->
-    <div id="share-link-display" style="display:none;margin-top:10px">
-      <!-- Link textarea -->
-      <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">Link — tocca per selezionare poi Copia</div>
-      <textarea id="share-link-ta" readonly onclick="this.select()" style="width:100%;background:var(--bg);border:1px solid rgba(0,212,240,.3);border-radius:6px;color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:9px;padding:8px;resize:none;height:52px;outline:none;word-break:break-all;"></textarea>
-      <button class="btn btn-secondary" style="width:100%;margin-top:5px;font-size:10px" onclick="copyLinkTA()">📋 Copia link</button>
-      <!-- QR code -->
-      <div id="qr-section" style="display:none;margin-top:12px;text-align:center">
-        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase">📷 QR Code — fai scansionare al collega</div>
-        <div id="qr-container" style="display:inline-block;padding:8px;background:#090d18;border-radius:8px;border:1px solid rgba(0,212,240,.2);"></div>
-      </div>
+
+    <!-- Area JSON espandibile -->
+    <div id="share-json-display" style="display:none;margin-top:10px">
+      <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">JSON — tocca e tieni premuto → Copia</div>
+      <textarea id="share-json-ta" readonly onclick="this.select()" style="width:100%;background:var(--bg);border:1px solid rgba(0,212,240,.25);border-radius:6px;color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:9px;padding:8px;resize:none;height:52px;outline:none;word-break:break-all;"></textarea>
+      <button class="btn btn-secondary" style="width:100%;margin-top:5px;font-size:10px" onclick="copyJSONta()">📋 Copia JSON</button>
     </div>
-    <button class="btn btn-secondary" style="width:100%;margin-top:10px" onclick="closeModal('modal-share')">Chiudi</button>
+
+    <!-- QR code per JSON link -->
+    <div id="qr-section" style="display:none;margin-top:12px;text-align:center">
+      <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase">📷 QR — fai scansionare al collega</div>
+      <div id="qr-container" style="display:inline-block;padding:8px;background:#090d18;border-radius:8px;border:1px solid rgba(0,212,240,.2);"></div>
+    </div>
+
+    <button class="btn btn-secondary" style="width:100%;margin-top:12px" onclick="closeModal('modal-share')">Chiudi</button>
   </div>
 </div>
 
@@ -608,7 +630,7 @@ function copyShareLink(){
 // ══════════════════════════════════════════
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.bnav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
   document.getElementById('form-bar').style.display = name==='form'?'flex':'none';
@@ -900,142 +922,140 @@ function collectData(){
 }
 
 // ══════════════════════════════════════════
-//  BUILD TESTO — HTML con valori in bold
-//  Formato: VALORE - descrizione
+//  BUILD TESTO  primary=bold/large  secondary=dim/small
 // ══════════════════════════════════════════
 function buildText(d){
   const N=v=>v!==null&&v!==undefined&&v!==''&&v!=='—'&&v!==0&&v!=='0';
-  const B=v=>`<b>${v}</b>`;    // valore in grassetto
-  const W=v=>` ⚠`;             // warning symbol
+  const B=v=>'<b>'+v+'</b>';
+  const S=v=>'<s>'+v+'</s>';
   let t='';
 
-  // ── HEADER ──
+  // HEADER
   const seat=(d.seat||'mono')==='bipo'?'BIPO':'MONO';
-  t+=`${B(d.carr||'?')} ${B(d.tipo||'?')} - ${seat}`;
-  if(N(d.nick)) t+=`  [${d.nick}]`;
-  t+=`\n${d.data||'?'} ${d.ora||'?'}\n`;
+  t+=B(d.carr||'?')+' '+B(d.tipo||'?')+' '+S('- '+seat);
+  if(N(d.nick)) t+=' '+S('['+d.nick+']');
+  t+='\n'+S((d.data||'?')+' '+(d.ora||'?'))+'\n';
 
-  // ── OPT (solo quelli attivi) ──
+  // MAINTENANCE (AMC/134/265/BSD — Para e Ruota hanno sezione propria)
   const optParts=[];
   OPT_KEYS.forEach(k=>{
+    if(k==='Para'||k==='Ruota') return;
     const v=(d.opts||{})[k]||0;
     if(k==='BSD'){
-      if(v===1) optParts.push(`${B('BSD inst')}`);
-      else if(v===2) optParts.push(`${B('BSD rim ⚠')}`);
+      if(v===1) optParts.push(B('BSD inst'));
+      else if(v===2) optParts.push(B('BSD rim \u26a0'));
     } else {
-      if(v===1) optParts.push(`${B(k+' OK')}`);
-      else if(v===2) optParts.push(`${B(k+' OFF ⚠')}`);
+      if(v===1) optParts.push(S(k)+' '+B('OK'));
+      else if(v===2) optParts.push(S(k)+' '+B('OFF \u26a0'));
     }
   });
   if(optParts.length) t+=optParts.join('  ')+'\n';
 
-  // Para
+  // Para: "Para sost. Rim x Inst y"
   const pSt=(d.opts||{})['Para']||0;
   if(pSt>0){
-    const pv=pSt===1?'OK':'OFF ⚠';
-    t+=`${B('Para '+pv)}`;
-    if(N(d.paraRim)) t+=`  Rim ${B(d.paraRim)}`;
-    if(N(d.paraInst)) t+=`  Inst ${B(d.paraInst)}`;
+    t+=B('Para')+' '+S('sost.');
+    if(N(d.paraRim))  t+='  '+S('Rim')+' '+B(d.paraRim);
+    if(N(d.paraInst)) t+='  '+S('Inst')+' '+B(d.paraInst);
     t+='\n';
   }
 
-  // Ruota — solo righe con inst valorizzato, niente header "Ruota:OK"
+  // Ruota: per ogni MLG con dati "NLG sost. Rim x Inst y"
   const rSt=(d.opts||{})['Ruota']||0;
   if(rSt>0){
     const rd=d.ruotaData||{};
-    let hasRuota=false;
-    Object.keys(rd).forEach(k=>{
-      if(rd[k].inst && rd[k].inst.trim()){
-        hasRuota=true;
-        const lbl=MLG_LABELS[k]||k;
-        const rStatus=rSt===1?'OK':'OFF ⚠';
-        t+=`${B(lbl+' '+rStatus)}`;
-        if(rd[k].rim && rd[k].rim.trim()) t+=`  Rim ${B(rd[k].rim)}`;
-        t+=`  Inst ${B(rd[k].inst)}\n`;
+    let hasAny=false;
+    MLG_KEYS.forEach(k=>{
+      const row=rd[k]; if(!row) return;
+      if((row.inst&&row.inst.trim())||(row.rim&&row.rim.trim())){
+        hasAny=true;
+        t+=B(MLG_LABELS[k]||k)+' '+S('sost.');
+        if(row.rim&&row.rim.trim())   t+='  '+S('Rim')+' '+B(row.rim);
+        if(row.inst&&row.inst.trim()) t+='  '+S('Inst')+' '+B(row.inst);
+        t+='\n';
       }
     });
-    // Se nessuna ruota con inst, almeno mostra lo stato
-    if(!hasRuota) t+=`${B('Ruota '+(rSt===1?'OK':'OFF'))}\n`;
+    if(!hasAny) t+=B('Ruota')+' '+S('sost.')+'\n';
   }
 
-  // ── CARBURANTE ──
+  // CARBURANTE (no blank line between EXT and Botte)
   t+='\n';
-  t+=`${B(d.res||0)} - kg RES\n`;
-  t+=`${B(d.tot||0)} - kg TOT\n`;
-  if(N(d.kFus)) t+=`${B(Math.round(d.kFus))} - kg FUS\n`;
-  if(N(d.kExt)) t+=`${B(Math.round(d.kExt))} - kg EXT ×${d.nTaniche}\n`;
-  t+='\n';
-  if(N(d.litri)) t+=`${B(d.litri)} - BOTTE L\n`;
-  if(N(d.dkg)) t+=`${B(Math.round(d.dkg))} - kg Calcolati\n`;
-  if(N(d.bkg)) t+=`${B(Math.round(d.bkg))} - kg Misurati 0,78\n`;
+  t+=B(d.res||0)+' '+S('- kg RES')+'\n';
+  t+=B(d.tot||0)+' '+S('- kg TOT')+'\n';
+  if(N(d.kFus)) t+=S(Math.round(d.kFus)+' - kg FUS')+'\n';
+  if(N(d.kExt)) t+=S(Math.round(d.kExt)+' - kg EXT \xd7'+d.nTaniche)+'\n';
+  if(N(d.litri)) t+=B(d.litri)+' '+S('- Botte L')+'\n';
+  if(N(d.dkg))   t+=S(Math.round(d.dkg)+' - kg Calcolati')+'\n';
+  if(N(d.bkg))   t+=S(Math.round(d.bkg)+' - kg Misurati 0,78')+'\n';
   if(N(d.sc)){
     const scOk=Math.abs(d.sc)<=SCARTO_MAX;
-    t+=`${B(d.sc.toFixed(1)+'%')} - Scarto${scOk?'':' ⚠'}\n`;
+    t+=S(d.sc.toFixed(1)+'% - Scarto'+(scOk?'':' \u26a0'))+'\n';
   }
 
-  // ── SISTEMI ──
-  t+='\n';
+  // SISTEMI
   const nogos=GN_FIELDS.filter(f=>(d.gn||{})[f]==='NOGO');
   const astLH=!!(d.astina||{})['ast-lh'];
   const astRH=!!(d.astina||{})['ast-rh'];
-  if(nogos.length===0 && !astLH && !astRH){
-    t+=`${B('GO')} - SYS\n`;
+  if(nogos.length===0&&!astLH&&!astRH){
+    t+=B('GO')+' '+S('- SYS')+'\n';
   } else {
     const sysMap={};
-    GN_FIELDS.forEach(f=>{ if((d.gn||{})[f]==='NOGO') sysMap[GN_LABELS[f]]='NO-GO ⚠'; });
+    GN_FIELDS.forEach(f=>{ if((d.gn||{})[f]==='NOGO') sysMap[GN_LABELS[f]]='NO-GO \u26a0'; });
     const sysLines=Object.entries(sysMap).map(([k,v])=>{
-      let line=`${B(v)} - ${k}`;
-      if(k==='LH ENG' && astLH) line+=`  Astina ${B('OK')}`;
-      if(k==='RH ENG' && astRH) line+=`  Astina ${B('OK')}`;
+      let line=B(v)+' '+S('- '+k);
+      if(k==='LH ENG'&&astLH) line+='  '+S('Astina')+' '+B('OK');
+      if(k==='RH ENG'&&astRH) line+='  '+S('Astina')+' '+B('OK');
       return line;
     });
-    if(astLH && !sysMap['LH ENG']) sysLines.push(`${B('GO')} - LH ENG  Astina ${B('OK')}`);
-    if(astRH && !sysMap['RH ENG']) sysLines.push(`${B('GO')} - RH ENG  Astina ${B('OK')}`);
+    if(astLH&&!sysMap['LH ENG']) sysLines.push(B('GO')+' '+S('- LH ENG')+'  '+S('Astina')+' '+B('OK'));
+    if(astRH&&!sysMap['RH ENG']) sysLines.push(B('GO')+' '+S('- RH ENG')+'  '+S('Astina')+' '+B('OK'));
     if(sysLines.length) t+=sysLines.join('\n')+'\n';
   }
 
-  // ── HYD ──
+  // HYD
   if(N(d.hydSx)||N(d.hydDx)){
-    const h1=parseFloat(d.hydSx), h2=parseFloat(d.hydDx);
-    const w1=!isNaN(h1)&&(h1<10||h1>12)?'⚠':'';
-    const w2=!isNaN(h2)&&(h2<10||h2>12)?'⚠':'';
-    t+='\n';
-    if(N(d.hydSx)) t+=`${B(d.hydSx)}${w1} - HYD 1\n`;
-    if(N(d.hydDx)) t+=`${B(d.hydDx)}${w2} - HYD 2\n`;
+    const h1=parseFloat(d.hydSx),h2=parseFloat(d.hydDx);
+    const w1=!isNaN(h1)&&(h1<10||h1>12)?'\u26a0':'';
+    const w2=!isNaN(h2)&&(h2<10||h2>12)?'\u26a0':'';
+    if(N(d.hydSx)) t+=B(d.hydSx)+w1+' '+S('- HYD 1')+'\n';
+    if(N(d.hydDx)) t+=B(d.hydDx)+w2+' '+S('- HYD 2')+'\n';
   }
 
-  // ── PAO ──
+  // PAO
   if(N(d.pao)){
     const pv=parseFloat(d.pao);
-    const pw=!isNaN(pv)&&(pv<0.37||pv>1.03)?'⚠':'';
-    t+=`${B(d.pao)}${pw} - PAO\n`;
+    const pw=!isNaN(pv)&&(pv<0.37||pv>1.03)?'\u26a0':'';
+    t+=B(d.pao)+pw+' '+S('- PAO')+'\n';
   }
 
-  // ── OXY ──
-  if(N(d.oxyFwd)){
-    const ov=parseFloat(d.oxyFwd);
-    t+=`${B(d.oxyFwd)}${!isNaN(ov)&&ov<200?'⚠':''} - OXY fwd\n`;
-  }
-  if(N(d.oxyAft)){
-    const oa=parseFloat(d.oxyAft);
-    t+=`${B(d.oxyAft)}${!isNaN(oa)&&oa<200?'⚠':''} - OXY aft\n`;
+  // OXY fwd + aft sulla stessa riga
+  if(N(d.oxyFwd)||N(d.oxyAft)){
+    let ox='';
+    if(N(d.oxyFwd)){
+      const ov=parseFloat(d.oxyFwd);
+      ox+=B(d.oxyFwd)+(!isNaN(ov)&&ov<200?'\u26a0':'')+' '+S('OXY fwd');
+    }
+    if(N(d.oxyAft)){
+      const oa=parseFloat(d.oxyAft);
+      if(ox) ox+='   ';
+      ox+=B(d.oxyAft)+(!isNaN(oa)&&oa<200?'\u26a0':'')+' '+S('OXY aft');
+    }
+    t+=ox+'\n';
   }
 
-  // ── OVI (Oggetti a Vita Indipendente) ──
+  // OVI — Hip DOPO APU
   if(['TF','AF','IOT'].includes(d.tipo)){
-    if(N(d.gboxSx)||N(d.gboxDx)||N(d.hipLh)||N(d.hipRh)||N(d.apu)){
-      t+='\n';
-      if(N(d.gboxSx)) t+=`${B(d.gboxSx)} - GB SX\n`;
-      if(N(d.gboxDx)) t+=`${B(d.gboxDx)} - GB DX\n`;
-      if(N(d.hipLh))  t+=`${B(d.hipLh)} - LH Hip\n`;
-      if(N(d.hipRh))  t+=`${B(d.hipRh)} - RH Hip\n`;
-      if(N(d.apu))    t+=`${B(d.apu)} - APU acc\n`;
+    if(N(d.gboxSx)||N(d.gboxDx)||N(d.apu)||N(d.hipLh)||N(d.hipRh)){
+      if(N(d.gboxSx)) t+=B(d.gboxSx)+' '+S('- GB SX')+'\n';
+      if(N(d.gboxDx)) t+=B(d.gboxDx)+' '+S('- GB DX')+'\n';
+      if(N(d.apu))    t+=B(d.apu)+' '+S('- APU acc')+'\n';
+      if(N(d.hipLh))  t+=B(d.hipLh)+' '+S('- LH Hip')+'\n';
+      if(N(d.hipRh))  t+=B(d.hipRh)+' '+S('- RH Hip')+'\n';
     }
   }
 
-  // ── NOTE ──
-  if(N(d.note)) t+=`\n${d.note}\n`;
-
+  // NOTE
+  if(N(d.note)) t+='\n'+d.note+'\n';
   return t.trim();
 }
 
@@ -1173,82 +1193,105 @@ function openShare(){
   openShareModal(_shareData);
 }
 function openShareModal(d){
+  const carr=d.carr||'?';
+  document.getElementById('share-modal-title').textContent='Consumabili '+carr;
+  document.getElementById('share-main-btn').textContent='\u2708 Condividi Consumabili '+carr;
   document.getElementById('share-preview').innerHTML=buildText(d);
-  document.getElementById('share-link-display').style.display='none';
+  document.getElementById('share-json-display').style.display='none';
+  document.getElementById('qr-section').style.display='none';
   document.getElementById('modal-share').classList.add('open');
 }
 
-// ── Bottone 1: condivide testo plain (leggibile da chiunque) ──
+// ── BOTTONE PRINCIPALE: testo leggibile via navigator.share ──
 function shareText(){
-  const text=buildTextPlain(_shareData);
+  const d=_shareData;
+  const text=buildTextPlain(d);
+  const title=`FlightLog ${d.carr||'?'} ${d.tipo||'?'} ${d.data||''}`;
   if(navigator.share){
-    navigator.share({title:'Scheda Volo',text})
-      .catch(e=>{ if(e.name!=='AbortError') doClipboard(text,'Testo copiato!'); });
+    navigator.share({title, text})
+      .catch(e=>{ if(e.name!=='AbortError') doClipboard(text,'Testo copiato! Incollalo su WhatsApp.'); });
   } else {
     doClipboard(text,'Testo copiato negli appunti!');
   }
 }
 
-// ── Bottone 2: genera link GitHub Pages con dati incorporati + QR ──
-function shareLink(){
+// ── JSON: mostra textarea con JSON da copiare + QR ──
+function shareJSON(){
   const d=_shareData;
-  const json=JSON.stringify(d);
-  const enc=btoa(encodeURIComponent(json));
-  const link=`${APP_BASE_URL}?d=${enc}`;
-
-  // Mostra link nella textarea
-  const ta=document.getElementById('share-link-ta');
-  ta.value=link;
-  document.getElementById('share-link-display').style.display='block';
-
-  // Genera QR code
-  generateQR(link);
-
-  // Prova navigator.share con URL
-  if(navigator.share){
-    navigator.share({
-      title:`FlightLog ${d.carr||'?'} ${d.tipo||'?'} ${d.data||''}`,
-      text:`✈ Scheda ${d.carr||'?'} ${d.tipo||'?'} ${d.data||''} — apri link per importare:`,
-      url:link
-    }).catch(e=>{ if(e.name!=='AbortError') ta.select(); });
-  } else {
-    doClipboard(link,'Link copiato! Incollalo su WhatsApp — sarà cliccabile.');
+  const json=buildSharePayload(d);
+  const ta=document.getElementById('share-json-ta');
+  ta.value=json;
+  const jd=document.getElementById('share-json-display');
+  jd.style.display=jd.style.display==='none'?'block':'none';
+  if(jd.style.display==='block'){
     ta.select();
+    // Genera anche QR con il json (per chi ha app)
+    generateQR(json);
   }
 }
 
+function copyJSONta(){
+  const ta=document.getElementById('share-json-ta');
+  ta.select();
+  doClipboard(ta.value,'JSON copiato! Il collega lo incolla nella tab Importa.');
+}
+
+// ── HTML: condivide il file app completo come file .html ──
+function shareHTML(){
+  const d=_shareData;
+  // Leggi l'HTML dell'intera pagina corrente
+  const htmlContent=document.documentElement.outerHTML;
+  const blob=new Blob([htmlContent],{type:'text/html'});
+  const filename=`Consumabili_${(d.carr||'app').replace(/[^a-zA-Z0-9\-]/g,'_')}.html`;
+
+  if(navigator.share && navigator.canShare && navigator.canShare({files:[new File([blob],filename,{type:'text/html'})]})){
+    // Android supporta la condivisione file
+    const file=new File([blob],filename,{type:'text/html'});
+    navigator.share({
+      title:'FlightLog App',
+      text:'Apri questo file nel browser per usare FlightLog',
+      files:[file]
+    }).catch(e=>{
+      if(e.name!=='AbortError') downloadHTML(blob,filename);
+    });
+  } else {
+    // Fallback: scarica il file (poi il collega lo invia manualmente)
+    downloadHTML(blob,filename);
+  }
+}
+
+function downloadHTML(blob,filename){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+  alert(`File "${filename}" scaricato.\nInvialo ai colleghi via WhatsApp — potranno aprirlo nel browser.`);
+}
+
+// ── QR code ──
 function generateQR(text){
   const section=document.getElementById('qr-section');
   const container=document.getElementById('qr-container');
-  if(!container){ section.style.display='none'; return; }
-  // Pulisci container precedente
+  if(!container){section.style.display='none';return;}
   container.innerHTML='';
-  if(typeof QRCode==='undefined'){
-    section.style.display='none';
-    return;
-  }
+  if(typeof QRCode==='undefined'){section.style.display='none';return;}
   section.style.display='block';
   try{
-    new QRCode(container, {
-      text: text,
-      width: 200,
-      height: 200,
-      colorDark: '#00d4f0',
-      colorLight: '#090d18',
-      correctLevel: QRCode.CorrectLevel.M
+    new QRCode(container,{
+      text,width:180,height:180,
+      colorDark:'#00d4f0',colorLight:'#090d18',
+      correctLevel:QRCode.CorrectLevel.M
     });
-  } catch(e){ section.style.display='none'; }
+  }catch(e){section.style.display='none';}
 }
 
-function copyLinkTA(){
-  const ta=document.getElementById('share-link-ta');
-  ta.select();
-  doClipboard(ta.value,'Link copiato!');
-}
+function copyLinkTA(){ /* legacy */ }
 
-function doClipboard(text, msg){
+function doClipboard(text,msg){
   navigator.clipboard.writeText(text)
-    .then(()=>{ if(msg) alert(msg); })
+    .then(()=>{if(msg)alert(msg);})
     .catch(()=>{
       try{
         const ta=document.createElement('textarea');
@@ -1256,17 +1299,17 @@ function doClipboard(text, msg){
         document.body.appendChild(ta);ta.focus();ta.select();
         document.execCommand('copy');
         document.body.removeChild(ta);
-        if(msg) alert(msg);
-      } catch(e){ alert('Copia manuale: tieni premuto sul testo → Copia'); }
+        if(msg)alert(msg);
+      }catch(e){alert('Tieni premuto sul testo → Copia');}
     });
 }
 
-// legacy
-function copyText(){ shareText(); }
-function copyJSON(){ doClipboard(buildSharePayload(_shareData),'JSON copiato!'); }
-function copyShareLink(){ shareLink(); }
-function fallbackCopy(text){ doClipboard(text,'Copiato!'); }
-function doShare(){ shareText(); }
+// legacy aliases
+function shareLink(){shareJSON();}
+function copyText(){shareText();}
+function copyJSON(){shareJSON();}
+function copyShareLink(){shareJSON();}
+function fallbackCopy(text){doClipboard(text,'Copiato!');}
 
 // ══════════════════════════════════════════
 //  IMPORT MANUALE
@@ -1339,5 +1382,11 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 </script>
 <!-- QRCode.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="bnav-tab active" onclick="showPage('form')" id="tab-form">✏ Compila</button>
+  <button class="bnav-tab" onclick="showPage('archive')" id="tab-archive">🗂 Archivio <span class="badge" id="arch-badge">0</span></button>
+  <button class="bnav-tab" onclick="showPage('import')" id="tab-import">📥 Importa</button>
+</div>
 </body>
 </html>
