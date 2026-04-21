@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>FlightLog 1.6</title>
+<title>Consumabili EFA</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@400;600;700;900&display=swap');
 :root{
@@ -139,7 +140,7 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 .note{font-size:9px;color:var(--muted);letter-spacing:.3px;margin-top:4px;}
 
 /* BOTTOM BAR */
-.bottom-bar{position:fixed;bottom:52px;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:8px 11px;display:flex;gap:6px;max-width:900px;margin:0 auto;z-index:101;}
+/* .bottom-bar: merged into bnav */
 .btn{flex:1;border:none;border-radius:8px;padding:11px 5px;font-family:'Exo 2',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
 .btn-primary {background:var(--accent);color:#000;}
 .btn-primary:active{transform:scale(.97);}
@@ -155,7 +156,7 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 .modal-title{font-size:12px;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:13px;text-transform:uppercase;}
 .preview-block{background:var(--bg);border-radius:8px;padding:11px;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.85;white-space:pre-wrap;color:var(--text);margin-bottom:8px;border:1px solid var(--border);}
 .preview-block b{font-size:17px;color:#fff;letter-spacing:.5px;}
-.preview-block s{font-size:11px;color:var(--muted);letter-spacing:.3px;text-decoration:none;font-style:normal;}
+.preview-block s{font-size:13px;color:var(--muted);letter-spacing:.3px;text-decoration:none;font-style:normal;}
 /* share link box */
 .share-link-box{background:rgba(0,212,240,.06);border:1px solid rgba(0,212,240,.25);border-radius:7px;padding:9px 11px;margin-bottom:13px;display:flex;align-items:center;gap:8px;cursor:pointer;}
 .share-link-box .link-ico{font-size:15px;flex-shrink:0;}
@@ -169,9 +170,9 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 .arch-item:active{border-color:var(--accent);}
 .arch-item.foreign{border-left:3px solid var(--orange);}
 .arch-meta{flex:1;min-width:0;}
-.arch-date{font-size:11px;color:var(--muted);font-family:'Share Tech Mono',monospace;}
-.arch-main{font-size:14px;font-weight:700;color:var(--text);font-family:'Share Tech Mono',monospace;margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.arch-sub{font-size:10px;color:var(--muted);letter-spacing:.5px;}
+.arch-date{font-size:12px;color:var(--muted);font-family:'Share Tech Mono',monospace;}
+.arch-main{font-size:16px;font-weight:700;color:var(--text);font-family:'Share Tech Mono',monospace;margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.arch-sub{font-size:11px;color:var(--muted);letter-spacing:.5px;}
 .arch-ico{font-size:17px;flex-shrink:0;}
 .arch-actions{display:flex;gap:5px;flex-shrink:0;}
 .arch-btn{border:none;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;}
@@ -184,11 +185,64 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 /* import success banner */
 .import-banner{display:none;background:rgba(0,232,122,.12);border:1px solid var(--green);border-radius:8px;padding:10px 13px;color:var(--green);font-size:12px;font-weight:700;margin-bottom:10px;}
 .import-banner.show{display:block;}
+
+/* ── TWO-ROW BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:102;background:var(--panel);
+  border-top:1px solid var(--border);padding:5px 8px 8px;max-width:900px;margin:0 auto;}
+.bnav-row{display:flex;gap:5px;margin-bottom:4px;}
+.bnav-row:last-child{margin-bottom:0;}
+.bnav-tab{flex:1;border:none;background:var(--bg);color:var(--muted);font-family:'Exo 2',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;
+  transition:all .15s;border:1px solid var(--border);border-radius:7px;padding:7px 3px;
+  display:flex;align-items:center;justify-content:center;gap:3px;}
+.bnav-tab.active{background:rgba(0,212,240,.15);color:var(--accent);border-color:var(--accent);}
+.bnav-tab.bnav-danger{color:var(--red);border-color:rgba(255,32,64,.3);}
+.bnav-tab .badge{background:var(--accent);color:#000;border-radius:10px;font-size:8px;font-weight:900;padding:1px 4px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);
+  background:rgba(10,14,26,.95);border:2px solid var(--green);color:var(--green);
+  padding:14px 28px;border-radius:12px;font-size:15px;font-weight:700;letter-spacing:1px;
+  z-index:999;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+
+/* ── LIGHT MODE ── */
+body.light{--bg:#f2f5f9;--panel:#ffffff;--border:#c5d0de;--text:#1a2840;--muted:#607080;}
+body.light input,body.light textarea{color:#1a2840;}
+body.light .preview-block{color:#1a2840;}
+body.light .preview-block s{color:#607080;}
+body.light .preview-block b{color:#000;}
+body.light .card{background:#fff;}
+body.light .app-headline{background:#fff;}
+body.light .nav-tabs,body.light .bottom-nav{background:#fff;}
+body.light .bnav-tab{background:#f2f5f9;color:#607080;}
+body.light .bnav-tab.active{background:rgba(0,180,210,.15);color:#0090b0;}
+body.light .arch-item .arch-item-inner{background:#fff;}
+
+/* ── ARCH SWIPE ── */
+.arch-item{position:relative;overflow:hidden;margin-bottom:7px;border-radius:9px;}
+.arch-swipe-bg-l,.arch-swipe-bg-r{position:absolute;top:0;bottom:0;width:80px;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.arch-swipe-bg-l{left:0;background:var(--green);color:#000;border-radius:9px 0 0 9px;}
+.arch-swipe-bg-r{right:0;background:var(--red);color:#fff;border-radius:0 9px 9px 0;}
+.arch-item-inner{position:relative;background:var(--panel);border:1px solid var(--border);
+  border-radius:9px;display:flex;align-items:center;gap:9px;padding:11px;
+  will-change:transform;}
+
+/* ── FIELD BLINK ── */
+@keyframes fieldBlink{
+  0%,100%{box-shadow:none;}
+  50%{box-shadow:0 0 0 3px rgba(0,212,240,.6);}
+}
+.field-active input,.field-active textarea{
+  border-color:var(--accent)!important;
+  box-shadow:0 0 0 2px rgba(0,212,240,.2)!important;
+}
 </style>
 </head>
 <body>
 
-<div class="app-headline">Consumabili EFA — skappa <span class="ver">2.6</span></div>
+<div class="app-headline">Consumabili EFA — skappa <span class="ver">2.7</span></div>
 
 
 <!-- ══════════ FORM PAGE ══════════ -->
@@ -200,7 +254,7 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
     <div class="id-top">
       <div class="field" style="margin-bottom:0">
         <label>Carr.</label>
-        <input type="text" id="f-carr" placeholder="› 4-xx" autocomplete="off" inputmode="text" maxlength="7" style="font-size:14px;letter-spacing:1px;text-align:left;padding-left:6px;">
+        <input type="text" id="f-carr" placeholder="4-xx" autocomplete="off" inputmode="text" maxlength="7" style="font-size:18px;letter-spacing:2px;text-align:left;padding-left:6px;">
       </div>
       <div class="field" style="margin-bottom:0">
         <label>Data (gg-mm-aa)</label>
@@ -221,7 +275,7 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
         </div>
       </div>
       <div class="field" style="margin-bottom:0">
-        <label>Nick</label>
+        <label>Nick crew chief</label>
         <input type="text" id="f-nick" placeholder="es. Mario" autocomplete="off" oninput="saveNick()">
       </div>
     </div>
@@ -345,23 +399,32 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
       </div>
     </div>
     <div class="note" style="margin-bottom:9px">HYD: avviso &lt;10.0 rosso · &gt;12.0 arancio</div>
-    <div class="row2" style="margin-bottom:0">
-      <div class="field" style="margin-bottom:0">
-        <label>PAO</label>
-        <input type="text" id="f-pao" placeholder="0.00" inputmode="decimal" oninput="checkPAO()">
-      </div>
+    <div class="field" style="margin-bottom:0" id="pao-field">
+      <label>PAO</label>
+      <input type="text" id="f-pao" placeholder="0.00" inputmode="decimal" oninput="checkPAO()">
+    </div>
+    <div class="o2-alert" id="pao-alert">⚠ PAO fuori range (0,37–1,03)</div>
+    <!-- OXY mono: fwd below PAO -->
+    <div id="oxy-mono-wrap" style="margin-top:8px">
       <div class="field" style="margin-bottom:0">
         <label>OXY fwd</label>
         <input type="text" id="f-oxy-fwd" placeholder="0" inputmode="decimal" oninput="checkOxy('f-oxy-fwd','oxy-alert-fwd')">
       </div>
+      <div class="o2-alert" id="oxy-alert-fwd">⚠ OXY fwd sotto 200 L</div>
     </div>
-    <div class="o2-alert" id="pao-alert">⚠ PAO fuori range (0,37–1,03)</div>
-    <div class="o2-alert" id="oxy-alert-fwd">⚠ OXY fwd sotto 200 L</div>
+    <!-- OXY bipo: fwd + aft side by side -->
     <div class="cond" id="oxy-bipo-block" style="margin-top:8px">
-      <div class="field" style="margin-bottom:0">
-        <label>OXY aft</label>
-        <input type="text" id="f-oxy-aft" placeholder="0" inputmode="decimal" oninput="checkOxy('f-oxy-aft','oxy-alert-aft')">
+      <div class="row2">
+        <div class="field" style="margin-bottom:0">
+          <label>OXY fwd</label>
+          <input type="text" id="f-oxy-fwd-b" placeholder="0" inputmode="decimal" oninput="checkOxy('f-oxy-fwd-b','oxy-alert-fwd-b')">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>OXY aft</label>
+          <input type="text" id="f-oxy-aft" placeholder="0" inputmode="decimal" oninput="checkOxy('f-oxy-aft','oxy-alert-aft')">
+        </div>
       </div>
+      <div class="o2-alert" id="oxy-alert-fwd-b">⚠ OXY fwd sotto 200 L</div>
       <div class="o2-alert" id="oxy-alert-aft">⚠ OXY aft sotto 200 L</div>
     </div>
   </div>
@@ -410,9 +473,15 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
     <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:7px;">🔒 Sicurezza dei dati</div>
     <div style="font-size:11px;color:var(--muted);line-height:1.7;">
       Tutti i dati rimangono <strong style="color:var(--text)">esclusivamente sul dispositivo</strong>, nel localStorage del browser — nessun server, nessuna trasmissione automatica.<br><br>
-      La condivisione avviene <strong style="color:var(--text)">solo su tua iniziativa esplicita</strong> tramite il sistema di messaggistica del dispositivo (WhatsApp, Signal, ecc.).<br><br>
+      La condivisione avviene <strong style="color:var(--text)">solo su tua iniziativa esplicita</strong> tramite il sistema di messaggistica del dispositivo (WhatsApp, SpikAd, ecc.).<br><br>
       Online è pubblicata <strong style="color:var(--text)">unicamente l’applicazione vuota</strong> su GitHub Pages: nessun dato operativo lascia il circuito cellulare del gruppo di lavoro. Il codice sorgente è pubblicamente ispezionabile per verificare l’assenza di telemetria.
     </div>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+      <button onclick="checkForUpdate()" id="update-btn" style="flex:1;min-width:110px;background:transparent;border:1px solid rgba(0,212,240,.2);border-radius:6px;color:var(--muted);padding:8px 4px;font-size:9px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;">🔄 Aggiornamenti</button>
+      <button onclick="installPWA()" id="install-btn" style="flex:1;min-width:110px;background:transparent;border:1px solid rgba(0,212,240,.2);border-radius:6px;color:var(--muted);padding:8px 4px;font-size:9px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;">📲 Aggiungi Home</button>
+      <button onclick="toggleTheme()" id="theme-btn" style="flex:1;min-width:110px;background:transparent;border:1px solid rgba(0,212,240,.2);border-radius:6px;color:var(--muted);padding:8px 4px;font-size:9px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;">☀ Light Mode</button>
+    </div>
+    <div id="update-msg" style="display:none;margin-top:6px;font-size:10px;padding:6px 10px;border-radius:5px;"></div>
   </div>
 
 </div><!-- /page-form -->
@@ -420,7 +489,10 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 <!-- ══════════ ARCHIVE PAGE ══════════ -->
 <div class="page" id="page-archive">
   <div style="padding-top:8px">
-    <input type="text" class="search-input" id="arch-search" placeholder="Cerca carrozzella / tipo / nick…" oninput="renderArchive()">
+    <div style="display:flex;gap:6px;margin-bottom:8px;">
+      <input type="text" class="search-input" id="arch-search" placeholder="Cerca carrozzella / tipo / nick…" oninput="renderArchive()" style="flex:1;margin-bottom:0;">
+      <button onclick="clearAllArchive()" style="flex-shrink:0;background:transparent;border:1px solid rgba(255,32,64,.3);border-radius:7px;color:var(--red);font-size:10px;font-weight:700;padding:0 12px;cursor:pointer;font-family:'Exo 2',sans-serif;letter-spacing:1px;white-space:nowrap;">🗑 Svuota</button>
+    </div>
     <div id="arch-list"><div class="arch-empty">Nessuna scheda salvata</div></div>
   </div>
 </div>
@@ -444,12 +516,6 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
   </div>
 </div>
 
-<!-- BOTTOM BAR -->
-<div class="bottom-bar" id="form-bar">
-  <button class="btn btn-danger"    onclick="resetForm()">Reset</button>
-  <button class="btn btn-secondary" onclick="saveRecord()">💾 Salva</button>
-  <button class="btn btn-primary"   onclick="openShare()">✈ Condividi</button>
-</div>
 
 <!-- MODAL SHARE -->
 <div class="modal-overlay" id="modal-share">
@@ -515,8 +581,7 @@ const FUS_MONO   = 4980;
 const FUS_BIPO   = 4300;
 const FUEL_DENS  = 0.78;
 const SCARTO_MAX = 2.0;
-const APP_VER    = '2.3';
-const APP_BASE_URL = 'https://qra4efa.github.io/flightlog/';
+
 
 const GN_FIELDS = ['gb-sx','gb-dx','gen-sx','gen-dx','eng-sx','eng-dx'];
 const GN_LABELS = {'gb-sx':'LH GBox','gb-dx':'RH GBox','gen-sx':'GEN 1','gen-dx':'GEN 2','eng-sx':'LH ENG','eng-dx':'RH ENG'};
@@ -633,7 +698,7 @@ function showPage(name){
   document.querySelectorAll('.bnav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
-  document.getElementById('form-bar').style.display = name==='form'?'flex':'none';
+  // form-bar removed - bnav handles all
   if(name==='archive') renderArchive();
 }
 
@@ -669,8 +734,10 @@ function setSeat(mode){
   seatConfig = mode;
   document.getElementById('btn-mono').className = 'seat-btn'+(mode==='mono'?' am':'');
   document.getElementById('btn-bipo').className = 'seat-btn'+(mode==='bipo'?' ab':'');
-  const bp = document.getElementById('oxy-bipo-block');
-  mode==='bipo' ? bp.classList.add('show') : bp.classList.remove('show');
+  const bp=document.getElementById('oxy-bipo-block');
+  const mw=document.getElementById('oxy-mono-wrap');
+  if(mode==='bipo'){bp.classList.add('show');if(mw)mw.style.display='none';}
+  else{bp.classList.remove('show');if(mw)mw.style.display='block';}
   calcFuel();
 }
 
@@ -913,7 +980,7 @@ function collectData(){
     litri,dkg:(res||tot)?dkg:null,bkg:litri?bkg:null,sc,
     gn:{...gnState},astina:{...asitinaState},
     hydSx:G('f-hyd-sx'),hydDx:G('f-hyd-dx'),
-    pao:G('f-pao'),oxyFwd:G('f-oxy-fwd'),oxyAft:seatConfig==='bipo'?G('f-oxy-aft'):null,
+    pao:G('f-pao'),oxyFwd:seatConfig==='bipo'?G('f-oxy-fwd-b'):G('f-oxy-fwd'),oxyAft:seatConfig==='bipo'?G('f-oxy-aft'):null,
     gboxSx:G('f-gbox-sx'),gboxDx:G('f-gbox-dx'),
     hipLh:G('f-hip-lh'),hipRh:G('f-hip-rh'),
     apu:G('f-apu'),
@@ -1061,7 +1128,7 @@ function buildText(d){
 
 // Versione plain-text per condivisione WhatsApp (senza tag HTML)
 function buildTextPlain(d){
-  return buildText(d).replace(/<b>/g,'').replace(/<\/b>/g,'');
+  return buildText(d).replace(/<b>/g,'').replace(/<\/b>/g,'').replace(/<s>/g,'').replace(/<\/s>/g,'');
 }
 
 // ══════════════════════════════════════════
@@ -1118,19 +1185,28 @@ function renderArchive(){
     const nogos=GN_FIELDS.filter(f=>(d.gn||{})[f]==='NOGO');
     const status=nogos.length?`<span style="color:var(--red);font-weight:700">${nogos.length} NOGO</span>`:'<span style="color:var(--green)">GO</span>';
     const nickTag=d.nick?` · <span style="color:var(--accent)">${d.nick}</span>`:'';
-    return `<div class="arch-item ${d.foreign?'foreign':''}" onclick="viewArchItem(${oi})">
-      <div class="arch-ico">${d.foreign?'✈':'📋'}</div>
-      <div class="arch-meta">
-        <div class="arch-date">${d.data||'?'} ${d.ora||'?'}${nickTag}</div>
-        <div class="arch-main">${d.carr||'?'} — ${d.tipo||'?'}</div>
-        <div class="arch-sub">${(d.seat||'mono').toUpperCase()} · ${status}</div>
-      </div>
-      <div class="arch-actions">
-        <button class="arch-btn" onclick="event.stopPropagation();shareArchItemIdx(${oi})">↑</button>
-        <button class="arch-btn del" onclick="event.stopPropagation();deleteArchItem(${oi})">✕</button>
+    return `<div class="arch-item" id="aitem-${oi}">
+      <div class="arch-swipe-bg-l">▶ Condividi</div>
+      <div class="arch-swipe-bg-r">✕ Elimina</div>
+      <div class="arch-item-inner" onclick="viewArchItem(${oi})">
+        <div class="arch-ico">${d.foreign?'✈':'📋'}</div>
+        <div class="arch-meta">
+          <div class="arch-date">${d.data||'?'} ${d.ora||'?'}${nickTag}</div>
+          <div class="arch-main" style="font-size:17px">${d.carr||'?'} — ${d.tipo||'?'}</div>
+          <div class="arch-sub">${(d.seat||'mono').toUpperCase()} · ${status}</div>
+        </div>
+        <div class="arch-actions">
+          <button class="arch-btn" onclick="event.stopPropagation();shareArchItemIdx(${oi})">↑</button>
+          <button class="arch-btn del" onclick="event.stopPropagation();deleteArchItem(${oi})">✕</button>
+        </div>
       </div>
     </div>`;
   }).join('');
+  // Attach swipe/longpress
+  fil.forEach(d=>{
+    const oi=archivio.indexOf(d);
+    attachArchInteraction(document.getElementById('aitem-'+oi), oi);
+  });
 }
 
 function viewArchItem(idx){
@@ -1168,7 +1244,8 @@ function loadIntoForm(d){
   asitinaState=d.astina?{...d.astina}:{};
   ['ast-lh','ast-rh'].forEach(k=>{const btn=document.getElementById('gn-'+k);if(btn){if(asitinaState[k]){btn.textContent='OK';btn.className='gn-btn astina active';}else{btn.textContent='—';btn.className='gn-btn astina';}}});
   S('f-hyd-sx',d.hydSx);S('f-hyd-dx',d.hydDx);
-  S('f-pao',d.pao);S('f-oxy-fwd',d.oxyFwd);S('f-oxy-aft',d.oxyAft);
+  S('f-pao',d.pao);
+  if(seatConfig==='bipo'){S('f-oxy-fwd-b',d.oxyFwd);S('f-oxy-aft',d.oxyAft);}else{S('f-oxy-fwd',d.oxyFwd);}
   S('f-gbox-sx',d.gboxSx);S('f-gbox-dx',d.gboxDx);
   S('f-hip-lh',d.hipLh);S('f-hip-rh',d.hipRh);
   S('f-apu',d.apu);
@@ -1315,26 +1392,37 @@ function fallbackCopy(text){doClipboard(text,'Copiato!');}
 //  IMPORT MANUALE
 // ══════════════════════════════════════════
 function doImport(){
-  // Prova prima a parsare come JSON diretto (dal link)
   const raw=document.getElementById('import-area').value.trim();
   if(!raw){alert('Incolla prima un testo.');return;}
-  // cerca JSON embedded nel testo (da link condiviso)
   let d=null;
+  // Try JSON first
   try{
-    const jsonMatch=raw.match(/\{.*\}/s);
+    const jsonMatch=raw.match(/\{[\s\S]*\}/);
     if(jsonMatch){ d=JSON.parse(jsonMatch[0]); d.foreign=true; }
-  } catch(e){}
-  if(!d){alert('❌ Formato non riconosciuto.');return;}
+  }catch(e){}
+  // Fallback: plain text
+  if(!d){
+    const lines=raw.split('\n').filter(l=>l.trim());
+    const first=lines[0]||'';
+    const carrM=first.match(/\b(\d{1,2}-\d{1,3}|X\S*)\b/i);
+    const dateM=raw.match(/\b(\d{2}[-\/]\d{2}[-\/]\d{2,4})\b/);
+    const timeM=raw.match(/\b(\d{2}:\d{2})\b/);
+    d={id:Date.now(),foreign:true,textOnly:true,
+      carr:carrM?carrM[1]:'—',tipo:'TXT',
+      data:dateM?dateM[1]:'—',ora:timeM?timeM[1]:'—',
+      seat:'mono',gn:{},astina:{},opts:{},ruotaData:{},mlgActive:{},
+      note:raw,res:0,tot:0,litri:0};
+    d._fp=d.carr+'|TXT|'+d.data+'|'+d.ora;
+  }
   if(archivio.find(a=>a.id===d.id)){alert('Scheda già presente.');return;}
-  archivio.unshift(d);archivio.sort((a,b)=>(b.data+b.ora).localeCompare(a.data+a.ora));
-  saveArchivio();document.getElementById('import-area').value='';
-  showImportBanner(`✅ Importata: ${d.carr} — ${d.tipo} — ${d.data}`, true);
+  archivio.unshift(d);
+  archivio.sort((a,b)=>(b.data+b.ora).localeCompare(a.data+a.ora));
+  saveArchivio();
+  document.getElementById('import-area').value='';
+  showImportBanner('\u2705 '+(d.textOnly?'Testo importato':'Scheda importata')+': '+d.carr+' \u2014 '+d.tipo+' \u2014 '+d.data, true);
   showPage('archive');
 }
 
-// ══════════════════════════════════════════
-//  RESET
-// ══════════════════════════════════════════
 function resetForm(){
   if(!confirm('Cancellare il form?'))return;
   document.querySelectorAll('#page-form input:not(#f-nick),#page-form textarea').forEach(i=>{
@@ -1378,15 +1466,314 @@ function resetForm(){
   setSeat('mono');
 }
 
+// ══════════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════════
+const APP_VER = '2.7';
+const APP_BASE_URL = 'https://qra4efa.github.io/flightlog/';
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+function showToast(msg, duration=1500){
+  const t = document.getElementById('toast');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), duration);
+}
+
+// ══════════════════════════════════════════
+//  BACKGROUND AUTO-SAVE (silent, no popup)
+// ══════════════════════════════════════════
+let _bgSaveTimer = null;
+function bgSave(){
+  clearTimeout(_bgSaveTimer);
+  _bgSaveTimer = setTimeout(()=>{
+    const d = collectData();
+    if(!d.carr || !d.tipo) return;  // not enough data yet
+    d._fp = d.carr+'|'+d.tipo+'|'+d.data+'|'+d.ora;
+    const dup = archivio.findIndex(a=> a._fp===d._fp && !a.foreign);
+    if(dup >= 0){ d.id = archivio[dup].id; archivio[dup] = d; }
+    else { d.id = Date.now(); archivio.unshift(d); }
+    archivio.sort((a,b)=>(b.data+b.ora).localeCompare(a.data+a.ora));
+    saveArchivio();
+  }, 800);
+}
+// Attach bgSave to all form inputs
+function attachBgSave(){
+  document.querySelectorAll('#page-form input, #page-form textarea').forEach(el=>{
+    el.addEventListener('input', bgSave);
+    el.addEventListener('change', bgSave);
+  });
+}
+
+// ══════════════════════════════════════════
+//  KEYBOARD FLOW
+// ══════════════════════════════════════════
+// _tipo and _sys are virtual stops (no real input id)
+const FLOW_MONO  = ['f-carr','_tipo','f-res','f-tot','f-litri','_sys','f-hyd-sx','f-hyd-dx','f-pao','f-oxy-fwd','f-note'];
+const FLOW_BIPO  = ['f-carr','_tipo','f-res','f-tot','f-litri','_sys','f-hyd-sx','f-hyd-dx','f-pao','f-oxy-fwd-b','f-oxy-aft','f-note'];
+const FLOW_OVI   = ['f-gbox-sx','f-gbox-dx','f-apu','f-hip-lh','f-hip-rh'];
+
+let _lastFlowId = null;
+let _blinkTimers = [];
+
+function clearAllBlink(){
+  _blinkTimers.forEach(t=> clearInterval(t));
+  _blinkTimers = [];
+  document.querySelectorAll('.field-active').forEach(el=> el.classList.remove('field-active'));
+  document.querySelectorAll('.pill, .gn-btn').forEach(el=>{ el.style.boxShadow=''; });
+}
+
+function blinkField(id){
+  clearAllBlink();
+  if(id==='_tipo'){
+    let n=0;
+    const btns = document.querySelectorAll('.pill');
+    const iv = setInterval(()=>{
+      n++;
+      btns.forEach(b=> b.style.boxShadow = (n%2===0)?'0 0 0 2px var(--accent)':'none');
+      if(n>=6){ clearInterval(iv); btns.forEach(b=> b.style.boxShadow='0 0 0 1px rgba(0,212,240,.4)'); }
+    }, 200);
+    _blinkTimers.push(iv);
+    return;
+  }
+  if(id==='_sys'){
+    let n=0;
+    const btns = document.querySelectorAll('.gn-btn');
+    const iv = setInterval(()=>{
+      n++;
+      btns.forEach(b=> b.style.boxShadow = (n%2===0)?'0 0 0 2px var(--accent)':'none');
+      if(n>=6){ clearInterval(iv); btns.forEach(b=> b.style.boxShadow='0 0 0 1px rgba(0,212,240,.3)'); }
+    }, 200);
+    _blinkTimers.push(iv);
+    return;
+  }
+  const el = document.getElementById(id);
+  if(!el) return;
+  const field = el.closest('.field');
+  if(field) field.classList.add('field-active');
+  let n=0;
+  const iv = setInterval(()=>{
+    n++;
+    el.style.boxShadow = (n%2===0)?'0 0 0 3px rgba(0,212,240,.5)':'none';
+    if(n>=6){ clearInterval(iv); el.style.boxShadow='0 0 0 2px rgba(0,212,240,.2)'; }
+  }, 180);
+  _blinkTimers.push(iv);
+}
+
+function scrollToEl(el){
+  if(!el) return;
+  const rect = el.getBoundingClientRect();
+  if(rect.top < 80 || rect.top > window.innerHeight*0.6){
+    window.scrollTo({top: window.scrollY + rect.top - 80, behavior:'smooth'});
+  }
+}
+
+function focusFlowField(id){
+  _lastFlowId = id;
+  blinkField(id);
+  if(id==='_tipo'||id==='_sys'){
+    // Keep keyboard visible by focusing a real input offscreen
+    const carr = document.getElementById('f-carr');
+    if(carr){ carr.focus(); }
+    const ref = id==='_tipo'? document.querySelector('.pill-row') : document.querySelector('.gn-grid');
+    if(ref) scrollToEl(ref);
+    return;
+  }
+  const el = document.getElementById(id);
+  if(!el || el.offsetParent===null) return;
+  el.focus();
+  el.select && el.select();
+  scrollToEl(el);
+}
+
+function getFlowList(){
+  const base = seatConfig==='bipo'? FLOW_BIPO : FLOW_MONO;
+  if(['TF','AF','IOT'].includes(tipoSel)){
+    const noteIdx = base.indexOf('f-note');
+    return [...base.slice(0, noteIdx), ...FLOW_OVI, 'f-note'];
+  }
+  return base;
+}
+
+function nextFlowId(currentId){
+  const list = getFlowList();
+  const idx = list.indexOf(currentId);
+  if(idx < 0) return null;
+  for(let i=idx+1; i<list.length; i++){
+    const nid = list[i];
+    if(nid==='_tipo'||nid==='_sys') return nid;
+    const el = document.getElementById(nid);
+    if(el && el.offsetParent!==null) return nid;
+  }
+  return null;  // end of flow
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Enter') return;
+  const active = document.activeElement;
+  if(active && active.tagName==='TEXTAREA' && !e.ctrlKey) return;
+  e.preventDefault();
+  const curId = (active && active.id) || _lastFlowId;
+
+  // Apply defaults at virtual stops
+  if(_lastFlowId==='_tipo' && !tipoSel) setTipo('BF');
+
+  const next = nextFlowId(curId||'f-carr');
+  if(next){
+    focusFlowField(next);
+  } else {
+    // End of flow: show toast, bg-save already done
+    showToast('✅ Consumabili salvati', 1200);
+    setTimeout(()=>{
+      window.scrollTo({top:0, behavior:'smooth'});
+      focusFlowField('f-carr');
+    }, 1300);
+  }
+});
+
+// ══════════════════════════════════════════
+//  ARCHIVE: swipe + long-press + clear all
+// ══════════════════════════════════════════
+function clearAllArchive(){
+  if(!confirm('Eliminare TUTTO l\'archivio? L\'operazione è irreversibile.')) return;
+  archivio = [];
+  saveArchivio();
+  renderArchive();
+}
+
+function attachArchInteraction(el, idx){
+  if(!el) return;
+  const inner = el.querySelector('.arch-item-inner');
+  if(!inner) return;
+  let startX=0, startY=0, moved=false, longTimer=null;
+
+  function onStart(cx,cy){
+    startX=cx; startY=cy; moved=false;
+    inner.style.transition='none';
+    longTimer = setTimeout(()=>{
+      if(!moved){
+        el.style.outline='2px solid var(--red)';
+        if(confirm('Eliminare questa scheda?')){ deleteArchItem(idx); }
+        else { el.style.outline=''; }
+      }
+    },2000);
+  }
+  function onMove(cx,cy){
+    const dx=cx-startX, dy=Math.abs(cy-startY);
+    if(dy>20){ clearTimeout(longTimer); return; }
+    moved=true; clearTimeout(longTimer);
+    inner.style.transform=`translateX(${Math.max(-100,Math.min(100,dx))}px)`;
+  }
+  function onEnd(cx){
+    clearTimeout(longTimer);
+    inner.style.transition='transform .25s';
+    inner.style.transform='translateX(0)';
+    const dx=cx-startX;
+    if(dx < -80 && confirm('Eliminare questa scheda?')) deleteArchItem(idx);
+    else if(dx > 80){ currentArchIdx=idx; shareArchItem(); }
+  }
+
+  el.addEventListener('touchstart',e=>onStart(e.touches[0].clientX,e.touches[0].clientY),{passive:true});
+  el.addEventListener('touchmove', e=>onMove(e.touches[0].clientX,e.touches[0].clientY),{passive:true});
+  el.addEventListener('touchend',  e=>onEnd(e.changedTouches[0].clientX),{passive:true});
+}
+
+// ══════════════════════════════════════════
+//  THEME TOGGLE
+// ══════════════════════════════════════════
+let _isDark = true;
+function toggleTheme(){
+  _isDark = !_isDark;
+  document.body.classList.toggle('light', !_isDark);
+  const btn=document.getElementById('theme-btn');
+  if(btn) btn.textContent = _isDark?'☀ Light Mode':'🌙 Dark Mode';
+  localStorage.setItem('flightlog_theme', _isDark?'dark':'light');
+}
+function applyTheme(){
+  _isDark = (localStorage.getItem('flightlog_theme')||'dark')==='dark';
+  document.body.classList.toggle('light', !_isDark);
+  const btn=document.getElementById('theme-btn');
+  if(btn) btn.textContent = _isDark?'☀ Light Mode':'🌙 Dark Mode';
+}
+
+// ══════════════════════════════════════════
+//  PWA INSTALL
+// ══════════════════════════════════════════
+let _deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); _deferredPrompt=e;
+  const btn=document.getElementById('install-btn');
+  if(btn){btn.style.color='var(--accent)';btn.style.borderColor='var(--accent)';}
+});
+function installPWA(){
+  if(_deferredPrompt){
+    _deferredPrompt.prompt();
+    _deferredPrompt.userChoice.then(()=>_deferredPrompt=null);
+  } else {
+    alert('Per aggiungere a Home:\n\niOS Safari: tocca ↑ → "Aggiungi a schermata Home"\nAndroid Chrome: menu ⋮ → "Aggiungi a schermata Home"');
+  }
+}
+
+// ══════════════════════════════════════════
+//  CHECK FOR UPDATE
+// ══════════════════════════════════════════
+async function checkForUpdate(){
+  const btn=document.getElementById('update-btn');
+  const msg=document.getElementById('update-msg');
+  btn.textContent='⏳ Controllo…'; btn.disabled=true;
+  try{
+    const r=await fetch('https://raw.githubusercontent.com/qra4efa/flightlog/main/index.html?t='+Date.now());
+    if(!r.ok) throw new Error(r.status);
+    const t=await r.text();
+    const m=t.match(/class="ver">([\d.]+)<\/span>/);
+    if(!m) throw new Error('no version');
+    const rv=m[1];
+    msg.style.display='block';
+    if(rv===APP_VER){
+      Object.assign(msg.style,{background:'rgba(0,232,122,.1)',color:'var(--green)',border:'1px solid var(--green)'});
+      msg.textContent='✅ Versione aggiornata ('+APP_VER+')';
+    } else {
+      Object.assign(msg.style,{background:'rgba(255,200,0,.1)',color:'var(--yellow)',border:'1px solid var(--yellow)'});
+      msg.innerHTML='⚠ Disponibile v'+rv+' (hai v'+APP_VER+'). <a href="'+APP_BASE_URL+'" target="_blank" style="color:var(--accent)">Aggiorna →</a>';
+    }
+  }catch(err){
+    msg.style.display='block';
+    Object.assign(msg.style,{background:'rgba(100,120,160,.1)',color:'var(--muted)',border:'1px solid var(--border)'});
+    msg.textContent='Controllo non disponibile (connessione assente)';
+  }
+  btn.textContent='🔄 Aggiornamenti'; btn.disabled=false;
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  applyTheme();
+  attachBgSave();
+  setTimeout(()=> focusFlowField('f-carr'), 350);
+});
+
+
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 </script>
 <!-- QRCode.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<!-- BOTTOM NAV -->
+<!-- TOAST -->
+<div class="toast" id="toast">✅ Consumabili salvati</div>
+<!-- BOTTOM NAV 2 rows -->
 <div class="bottom-nav">
-  <button class="bnav-tab active" onclick="showPage('form')" id="tab-form">✏ Compila</button>
-  <button class="bnav-tab" onclick="showPage('archive')" id="tab-archive">🗂 Archivio <span class="badge" id="arch-badge">0</span></button>
-  <button class="bnav-tab" onclick="showPage('import')" id="tab-import">📥 Importa</button>
+  <div class="bnav-row">
+    <button class="bnav-tab active" onclick="showPage('form')" id="tab-form">✏ Compila</button>
+    <button class="bnav-tab" onclick="openShare()" id="bnav-share">✈ Condividi</button>
+  </div>
+  <div class="bnav-row">
+    <button class="bnav-tab bnav-danger" onclick="resetForm()">↺ Reset</button>
+    <button class="bnav-tab" onclick="showPage('archive')" id="tab-archive">🗂 Archivio <span class="badge" id="arch-badge">0</span></button>
+    <button class="bnav-tab" onclick="showPage('import')" id="tab-import">📥 Importa</button>
+  </div>
 </div>
 </body>
 </html>
