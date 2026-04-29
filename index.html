@@ -265,7 +265,7 @@ body.dark .preview-block b{color:#fff;}
 </head>
 <body>
 
-<div class="app-headline">Consumabili EFA — skappa <span class="ver">4.9</span></div>
+<div class="app-headline">Consumabili EFA — skappa <span class="ver">5.0</span></div>
 
 
 <!-- ══════════ FORM PAGE ══════════ -->
@@ -495,7 +495,8 @@ body.dark .preview-block b{color:#fff;}
     <div style="font-size:11px;color:var(--muted);line-height:1.7;">
       Tutti i dati rimangono <strong style="color:var(--text)">esclusivamente sul dispositivo</strong>, nel localStorage del browser — nessun server, nessuna trasmissione automatica.<br><br>
       La condivisione avviene <strong style="color:var(--text)">solo su tua iniziativa esplicita</strong> tramite il sistema di messaggistica del dispositivo (WhatsApp, SpikAd, ecc.).<br><br>
-      Online è pubblicata <strong style="color:var(--text)">unicamente l’applicazione vuota</strong> su GitHub Pages: nessun dato operativo lascia il circuito cellulare del gruppo di lavoro. Il codice sorgente è pubblicamente ispezionabile per verificare l’assenza di telemetria.
+      Online è pubblicata <strong style="color:var(--text)">unicamente l’applicazione vuota</strong> su GitHub Pages: nessun dato operativo lascia il circuito cellulare del gruppo di lavoro. Il codice sorgente è pubblicamente ispezionabile per verificare l’assenza di telemetria.<br><br>
+      <strong style="color:var(--text)">Files Tecnici</strong> — La sezione <em>Condividi APP e Files Tecnici</em> dà accesso a documentazione operativa sensibile: Sinno Stegni List, MDP NOGO SEE-IN e MDP NOGO SEE-OFF. Per ragioni di sicurezza operativa questi files <strong style="color:var(--text)">non sono presenti sul server pubblico</strong>. Vengono distribuiti esclusivamente tramite <strong style="color:var(--text)">condivisione peer-to-peer cifrata</strong> (WhatsApp) su richiesta esplicita. Una volta installati, rimangono memorizzati solo sul dispositivo locale e non vengono mai trasmessi in rete.
     </div>
     <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
       <button onclick="checkForUpdate()" id="update-btn" style="flex:1;min-width:100px;background:transparent;border:1px solid rgba(0,212,240,.2);border-radius:6px;color:var(--muted);padding:8px 4px;font-size:9px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;">🔄 Aggiornamenti</button>
@@ -569,9 +570,7 @@ body.dark .preview-block b{color:#fff;}
       <button class="btn btn-secondary" style="flex:1;font-size:10px;padding:10px 4px;line-height:1.5" onclick="shareJSON()">
         📦 JSON<br><span style="font-size:8px;opacity:.6;font-weight:400">importa dati</span>
       </button>
-      <button class="btn btn-secondary" style="flex:1;font-size:10px;padding:10px 4px;line-height:1.5" onclick="shareHTML()">
-        📱 HTML<br><span style="font-size:8px;opacity:.6;font-weight:400">invia app completa</span>
-      </button>
+      
     </div>
 
     <!-- Area JSON espandibile -->
@@ -1064,13 +1063,12 @@ function buildText(d){
   });
   if(optParts.length) t+=optParts.join('  ')+'\n';
 
-  // Para: "Para sost. Rim x Inst y"
+  // Para: serial numbers on next line
   const pSt=(d.opts||{})['Para']||0;
   if(pSt>0){
-    t+=B('Para')+' '+S('sost.');
-    if(N(d.paraRim))  t+='  '+S('Rim')+' '+B(d.paraRim);
-    if(N(d.paraInst)) t+='  '+S('Inst')+' '+B(d.paraInst);
-    t+='\n';
+    t+=B('Para')+' '+S('sost.')+'\n';
+    if(N(d.paraRim))  t+='  '+S('Rim')+' '+B(d.paraRim)+'\n';
+    if(N(d.paraInst)) t+='  '+S('Inst')+' '+B(d.paraInst)+'\n';
   }
 
   // Ruota: show each selected MLG (with or without serials)
@@ -1083,18 +1081,23 @@ function buildText(d){
     } else {
       activeMlg.forEach(k=>{
         const row=rd[k]||{};
-        t+=B(MLG_LABELS[k]||k)+' '+S('sost.');
-        if(row.rim&&row.rim.trim()) t+='  '+S('Rim')+' '+B(row.rim);
-        if(row.inst&&row.inst.trim()) t+='  '+S('Inst')+' '+B(row.inst);
-        t+='\n';
+        t+=B(MLG_LABELS[k]||k)+' '+S('sost.')+'\n';
+        if(row.rim&&row.rim.trim())   t+='  '+S('Rim')+' '+B(row.rim)+'\n';
+        if(row.inst&&row.inst.trim()) t+='  '+S('Inst')+' '+B(row.inst)+'\n';
       });
     }
   }
 
   // CARBURANTE (no blank line between EXT and Botte)
   t+='\n';
-  if(N(d.res)&&parseFloat(d.res)!==0) t+=B(d.res)+' '+S('- kg RES')+'\n';
-  if(N(d.tot)&&parseFloat(d.tot)!==0) t+=B(d.tot)+' '+S('- kg TOT')+'\n';
+  const fRes=parseFloat(d.res)||0;
+  const fTot=parseFloat(d.tot)||0;
+  if(fTot!==0){
+    if(fRes!==0 && fRes!==fTot) t+=B(d.res)+' '+S('- kg RES')+'\n';
+    t+=B(d.tot)+' '+S('- kg TOT')+'\n';
+  } else if(fRes!==0){
+    t+=B(d.res)+' '+S('- kg TOT')+'\n';
+  }
   if(N(d.litri)&&parseFloat(d.litri)!==0) t+=B(d.litri)+' '+S('- Botte/Grifus L')+'\n';
 
   // SISTEMI
@@ -1997,16 +2000,33 @@ function docsLoaded(){
 function renderDocMgmt(){
   const el=document.getElementById('doc-mgmt');
   if(!el) return;
+  const bs='display:block;width:100%;border-radius:6px;padding:10px;font-size:10px;'+
+           "font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;"+
+           'text-transform:uppercase;cursor:pointer;margin-bottom:6px;text-align:center;';
+  const title='<div style="font-size:10px;color:var(--muted);margin-bottom:8px;'+
+              'letter-spacing:1px;text-transform:uppercase;font-weight:700;">'+
+              '🔗 Condividi APP e Files Tecnici</div>';
+  const shareApp='<button onclick="shareHTML()" style="'+bs+
+    'background:rgba(0,212,240,.12);border:1px solid rgba(0,212,240,.3);'+
+    'color:var(--accent);">\u2708 Condividi APP</button>';
   if(docsLoaded()){
-    el.innerHTML='<button onclick="deleteAllDocs()" style="width:100%;background:rgba(255,32,64,.12);border:1px solid rgba(255,32,64,.3);border-radius:6px;color:var(--red);padding:9px;font-size:10px;font-family:\'Exo 2\',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">\uD83D\uDDD1 Rimuovi documenti importati</button>';
+    el.innerHTML=title+shareApp+
+      '<button onclick="deleteAllDocs()" style="'+bs+
+      'background:rgba(255,32,64,.08);border:1px solid rgba(255,32,64,.25);'+
+      'color:var(--red);">\uD83D\uDDD1 Rimuovi Files Tecnici</button>';
   } else {
-    el.innerHTML=
-      '<div style="font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;">Documenti tecnici</div>'+
-      '<button onclick="openSpikAdRequest()" style="display:block;width:100%;background:rgba(0,212,240,.1);border:1px solid rgba(0,212,240,.3);border-radius:6px;color:var(--accent);padding:10px;font-size:10px;font-family:\'Exo 2\',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-bottom:6px;">\u2708 Richiedi su SpikAd</button>'+
-      '<label style="display:block;text-align:center;background:rgba(0,212,240,.06);border:1px solid rgba(0,212,240,.2);border-radius:6px;color:var(--muted);padding:10px;font-size:10px;font-family:\'Exo 2\',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">'+
-        '\uD83D\uDCE5 Importa pacchetto (.zip / .json)'+
-        '<input type="file" accept=".zip,.json" style="display:none" onchange="importDocPackage(this)">'+
-      '</label>';
+    el.innerHTML=title+shareApp+
+      '<div style="display:flex;gap:6px;">'+
+        '<button onclick="openSpikAdRequest()" style="flex:1;'+bs+
+          'background:rgba(0,212,240,.08);border:1px solid rgba(0,212,240,.25);'+
+          'color:var(--accent);">\uD83D\uDCF2 Richiedi Files Tecnici</button>'+
+        '<label style="flex:1;'+bs+
+          'background:rgba(0,212,240,.04);border:1px solid rgba(0,212,240,.15);'+
+          'color:var(--muted);">'+
+          '\uD83D\uDCE5 Installa Files Tecnici'+
+          '<input type="file" accept=".zip,.json" style="display:none" onchange="importDocPackage(this)">'+
+        '</label>'+
+      '</div>';
   }
 }
 
