@@ -54,7 +54,7 @@ input[type=text],input[type=number],input[type=date],input[type=time],textarea{
   padding:7px 10px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;
 }
 /* Campi non numerici/chiave: font più piccolo */
-input[type=date],input[type=time],#f-nick,#f-data{font-size:14px;}
+input[type=date],input[type=time],#f-data{font-size:14px;}#f-nick{font-size:16px;}
 input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,212,240,.12);}
 input.warn-low {border-color:var(--red)!important;color:var(--red)!important;}
 input.warn-high{border-color:var(--orange)!important;color:var(--orange)!important;}
@@ -261,11 +261,14 @@ body.dark .preview-block b{color:#fff;}
 .bnav-tab .bnav-lbl{font-size:10px;letter-spacing:.5px;}
 .bnav-row:first-child .bnav-tab .bnav-ico{font-size:18px;}
 .bnav-row:first-child .bnav-tab .bnav-lbl{font-size:11px;}
+
+/* HYD, PAO, OXY: +2px */
+#f-hyd-sx,#f-hyd-dx,#f-pao,#f-oxy-fwd,#f-oxy-fwd-b,#f-oxy-aft{font-size:22px!important;}
 </style>
 </head>
 <body>
 
-<div class="app-headline">Consumabili EFA — skappa <span class="ver">5.0</span></div>
+<div class="app-headline">Consumabili EFA — skappa <span class="ver">5.1</span></div>
 
 
 <!-- ══════════ FORM PAGE ══════════ -->
@@ -277,7 +280,7 @@ body.dark .preview-block b{color:#fff;}
     <div class="id-top">
       <div class="field" style="margin-bottom:0">
         <label>Carr.</label>
-        <input type="text" id="f-carr" placeholder="4-xx" autocomplete="off" inputmode="text" maxlength="7" style="font-size:20px;letter-spacing:2px;text-align:left;padding-left:6px;">
+        <input type="text" id="f-carr" placeholder="4-xx" autocomplete="off" inputmode="text" maxlength="7" style="font-size:22px;letter-spacing:2px;text-align:left;padding-left:6px;">
       </div>
       <div class="field" style="margin-bottom:0">
         <label>Data (gg-mm-aa)</label>
@@ -505,9 +508,9 @@ body.dark .preview-block b{color:#fff;}
     </div>
     <div id="update-msg" style="display:none;margin-top:6px;font-size:10px;padding:6px 10px;border-radius:5px;"></div>
     <div style="display:flex;gap:6px;margin-top:8px;">
-      <button onclick="openSSL()" style="flex:1;background:rgba(0,212,240,.08);border:1px solid rgba(0,212,240,.3);border-radius:6px;color:var(--accent);padding:9px 4px;font-size:10px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">📋 SSL</button>
-      <button onclick="openSeeIn()" style="flex:1;background:rgba(0,212,240,.08);border:1px solid rgba(0,212,240,.3);border-radius:6px;color:var(--accent);padding:9px 4px;font-size:10px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">📋 See-In</button>
-      <button onclick="openSeeOff()" style="flex:1;background:rgba(0,212,240,.08);border:1px solid rgba(0,212,240,.3);border-radius:6px;color:var(--accent);padding:9px 4px;font-size:10px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">📋 See-Off</button>
+      <button id="btn-ssl" onclick="openSSL()" style="flex:1;background:rgba(0,212,240,.08);border:1px solid rgba(0,212,240,.3);border-radius:6px;color:var(--accent);padding:9px 4px;font-size:15px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">📋 SSL</button>
+      <button id="btn-seein" onclick="openSeeIn()" style="flex:1;background:rgba(0,212,240,.08);border:1px solid rgba(0,212,240,.3);border-radius:6px;color:var(--accent);padding:9px 4px;font-size:15px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">📋 See-In</button>
+      <button id="btn-seeoff" onclick="openSeeOff()" style="flex:1;background:rgba(0,212,240,.08);border:1px solid rgba(0,212,240,.3);border-radius:6px;color:var(--accent);padding:9px 4px;font-size:15px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">📋 See-Off</button>
     </div>
     <div id="doc-mgmt" style="margin-top:8px;"></div>
   </div>
@@ -1956,7 +1959,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   // showPage hides it on non-form pages
   applyTheme();
   attachBgSave();
-  if(archivio.length>0) loadIntoForm(archivio[0]);
+  // Auto-load last record only if modified within 1 hour
+  if(archivio.length>0){
+    const rec=archivio[0];
+    const recTime=rec.id||0; // id is Date.now() at save time
+    const oneHour=60*60*1000;
+    if(Date.now()-recTime < oneHour){
+      loadIntoForm(rec);
+    }
+  }
   setTimeout(()=>focusFlowField('f-carr'),400);
   loadSavedImgs();
 });
@@ -2115,6 +2126,10 @@ function showLoadedImg(key, modalId, data){
   const nl=document.getElementById(modalId+'_notloaded');
   if(img){img.src=data;img.style.display='block';}
   if(nl) nl.style.display='none';
+  // Color the doc button orange when file is loaded
+  const btnMap={'ssl_img':'btn-ssl','seein_img':'btn-seein','seeoff_img':'btn-seeoff'};
+  const btn=document.getElementById(btnMap[key]);
+  if(btn){btn.style.background='rgba(255,160,0,.2)';btn.style.borderColor='rgba(255,160,0,.5)';btn.style.color='var(--orange)';}
 }
 
 function loadImgFile(input, key, modalId){
