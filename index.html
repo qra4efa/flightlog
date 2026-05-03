@@ -268,7 +268,7 @@ body.dark .preview-block b{color:#fff;}
 </head>
 <body>
 
-<div class="app-headline">Consumabili EFA — skappa <span class="ver">5.1</span></div>
+<div class="app-headline">Consumabili EFA — skappa <span class="ver">5.3</span></div>
 
 
 <!-- ══════════ FORM PAGE ══════════ -->
@@ -327,6 +327,15 @@ body.dark .preview-block b{color:#fff;}
         <button class="opt-pill" id="opt-Para"  onclick="cycleOpt('Para')">Para</button>
         <button class="opt-pill" id="opt-Ruota" onclick="cycleOpt('Ruota')">Ruota</button>
         <button class="opt-pill" id="opt-BSD"   onclick="cycleOpt('BSD')">BSD</button>
+      </div>
+      <!-- Legatura: solo BIPO -->
+      <div class="cond" id="legatura-row" style="margin-top:6px;display:none;">
+        <label style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px;">Legatura</label>
+        <div style="display:flex;gap:5px;">
+          <button class="opt-pill" id="leg-both"  onclick="setLegatura('both')"  style="flex:1;">Both</button>
+          <button class="opt-pill" id="leg-solo"  onclick="setLegatura('solo')"  style="flex:1;">Solo</button>
+          <button class="opt-pill" id="leg-front" onclick="setLegatura('front')" style="flex:1;">Front</button>
+        </div>
       </div>
       <!-- Para sub-fields -->
       <div class="cond" id="para-fields" style="margin-top:5px">
@@ -570,9 +579,7 @@ body.dark .preview-block b{color:#fff;}
     <!-- RIGA 2: bottoni secondari JSON + HTML -->
     <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Strumenti colleghi con app</div>
     <div style="display:flex;gap:7px;">
-      <button class="btn btn-secondary" style="flex:1;font-size:10px;padding:10px 4px;line-height:1.5" onclick="shareJSON()">
-        📦 JSON<br><span style="font-size:8px;opacity:.6;font-weight:400">importa dati</span>
-      </button>
+      
       
     </div>
 
@@ -770,8 +777,15 @@ function setSeat(mode){
   document.getElementById('btn-bipo').className = 'seat-btn'+(mode==='bipo'?' ab':'');
   const bp=document.getElementById('oxy-bipo-block');
   const mw=document.getElementById('oxy-mono-wrap');
-  if(mode==='bipo'){bp.classList.add('show');if(mw)mw.style.display='none';}
-  else{bp.classList.remove('show');if(mw)mw.style.display='block';}
+  const lr=document.getElementById('legatura-row');
+  if(mode==='bipo'){
+    bp.classList.add('show');if(mw)mw.style.display='none';
+    if(lr)lr.style.display='block';
+  } else {
+    bp.classList.remove('show');if(mw)mw.style.display='block';
+    if(lr)lr.style.display='none';
+    setLegatura('both'); // reset to default
+  }
   calcFuel();
 }
 
@@ -784,6 +798,33 @@ function setTipo(t){
   document.getElementById('pill-'+t).classList.add('active');
   const extra = document.getElementById('extra-fields');
   ['TF','AF','IOT'].includes(t) ? extra.classList.add('show') : extra.classList.remove('show');
+  // AF: show only KG Rimanente, hide all other fuel fields
+  const afFuelHide = ['f-tot','f-litri','fuel-compact'];
+  const fuelRow = document.querySelector('.row3');
+  if(t==='AF'){
+    afFuelHide.forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.closest('.field')?el.closest('.field').style.display='none':el.style.display='none';
+    });
+    if(fuelRow){
+      // Hide tot and litri columns in row3
+      const fields=fuelRow.querySelectorAll('.field');
+      fields.forEach((f,i)=>{ if(i>0) f.style.display='none'; });
+    }
+    const calcRow=document.querySelector('.calc-row');
+    if(calcRow) calcRow.style.display='none';
+  } else {
+    // Restore all fuel fields
+    afFuelHide.forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){
+        if(el.closest('.field')) el.closest('.field').style.display='';
+        else el.style.display='';
+      }
+    });
+    if(fuelRow) fuelRow.querySelectorAll('.field').forEach(f=>f.style.display='');
+    calcFuel(); // recalculate visibility
+  }
 }
 
 // ══════════════════════════════════════════
@@ -1032,7 +1073,8 @@ function collectData(){
     gboxSx:G('f-gbox-sx'),gboxDx:G('f-gbox-dx'),
     hipLh:G('f-hip-lh'),hipRh:G('f-hip-rh'),
     apu:G('f-apu'),
-    note:G('f-note')
+    note:G('f-note'),
+    legatura:seatConfig==='bipo'?legaturaState:'both'
   };
 }
 
@@ -1048,6 +1090,7 @@ function buildText(d){
   // HEADER
   const seat=(d.seat||'mono')==='bipo'?'BIPO':'MONO';
   t+=B(d.carr||'?')+' '+B(d.tipo||'?')+' '+S('- '+seat);
+  if(d.legatura&&d.legatura!=='both') t+=' '+B(d.legatura==='solo'?'Legato Solo':'Legato Front')+'\n';
   if(N(d.nick)) t+=' '+S('['+d.nick+']');
   t+='\n'+S((d.data||'?')+' '+(d.ora||'?'))+'\n';
 
@@ -1299,6 +1342,7 @@ function loadIntoForm(d){
   S('f-hip-lh',d.hipLh);S('f-hip-rh',d.hipRh);
   S('f-apu',d.apu);
   S('f-note',d.note);
+  if(d.legatura) setLegatura(d.legatura);
   calcFuel();
 }
 function deleteArchItem(idx){
@@ -1864,6 +1908,31 @@ function installPWA(){
 // ══════════════════════════════════════════
 //  CHECK FOR UPDATE
 // ══════════════════════════════════════════
+// Auto-check on startup
+async function autoCheckUpdate(){
+  try{
+    const r=await fetch('https://raw.githubusercontent.com/qra4efa/flightlog/main/index.html?t='+Date.now());
+    if(!r.ok) return;
+    const t=await r.text();
+    const m=t.match(/class="ver">([\d.]+)<\/span>/);
+    if(!m) return;
+    if(m[1]!==APP_VER && m[1]>APP_VER){
+      showToast('⚠ App v'+m[1]+' disponibile — aggiorna!',3000);
+      // Blink update buttons until user sees it
+      let blinkCount=0;
+      const biv=setInterval(()=>{
+        blinkCount++;
+        ['update-btn','update-btn2'].forEach(id=>{
+          const b=document.getElementById(id);
+          if(b) b.style.background=blinkCount%2?'rgba(255,200,0,.2)':'';
+        });
+        if(blinkCount>20) clearInterval(biv); // stop after 10 sec
+      },500);
+      localStorage.setItem('efa_update_available',m[1]);
+    }
+  }catch(e){}
+}
+
 async function checkForUpdate(){
   const btn=document.getElementById('update-btn');
   const msg=document.getElementById('update-msg');
@@ -1969,6 +2038,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
   }
   setTimeout(()=>focusFlowField('f-carr'),400);
+  setTimeout(autoCheckUpdate, 2000); // check update after 2s
   loadSavedImgs();
 });
 
@@ -2011,15 +2081,15 @@ function docsLoaded(){
 function renderDocMgmt(){
   const el=document.getElementById('doc-mgmt');
   if(!el) return;
-  const bs='display:block;width:100%;border-radius:6px;padding:10px;font-size:10px;'+
+  const bs="display:block;width:100%;border-radius:6px;padding:10px;font-size:10px;"+
            "font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;"+
-           'text-transform:uppercase;cursor:pointer;margin-bottom:6px;text-align:center;';
+           "text-transform:uppercase;cursor:pointer;margin-bottom:6px;text-align:center;";
   const title='<div style="font-size:10px;color:var(--muted);margin-bottom:8px;'+
               'letter-spacing:1px;text-transform:uppercase;font-weight:700;">'+
               '🔗 Condividi APP e Files Tecnici</div>';
   const shareApp='<button onclick="shareHTML()" style="'+bs+
     'background:rgba(0,212,240,.12);border:1px solid rgba(0,212,240,.3);'+
-    'color:var(--accent);">\u2708 Condividi APP</button>';
+    'color:var(--accent);">\u2708 Condividi APP al Collega</button>';
   if(docsLoaded()){
     el.innerHTML=title+shareApp+
       '<button onclick="deleteAllDocs()" style="'+bs+
@@ -2039,6 +2109,9 @@ function renderDocMgmt(){
         '</label>'+
       '</div>';
   }
+  // Sync theme btn text
+  const tb=document.getElementById('theme-btn2');
+  if(tb) tb.textContent=document.body.classList.contains('dark')?'\u2600 Light Mode':'\U0001f319 Dark Mode';
 }
 
 function openSpikAdRequest(){
@@ -2145,6 +2218,26 @@ function loadImgFile(input, key, modalId){
   reader.readAsDataURL(file);
 }
 
+
+// ══ Legatura (BIPO only) ══
+let legaturaState = 'both';
+function setLegatura(val){
+  legaturaState = val;
+  ['both','solo','front'].forEach(v=>{
+    const btn=document.getElementById('leg-'+v);
+    if(!btn) return;
+    if(v===val && v!=='both'){
+      btn.style.background='rgba(255,144,32,.25)';
+      btn.style.color='var(--orange)';
+      btn.style.borderColor='rgba(255,144,32,.5)';
+    } else {
+      btn.style.background='';
+      btn.style.color='';
+      btn.style.borderColor='';
+    }
+  });
+  bgSave && bgSave();
+}
 
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 </script>
