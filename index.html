@@ -268,7 +268,7 @@ body.dark .preview-block b{color:#fff;}
 </head>
 <body>
 
-<div class="app-headline">Consumabili EFA — skappa <span class="ver">5.3</span></div>
+<div class="app-headline">Consumabili EFA — skappa <span class="ver">6.0</span></div>
 
 
 <!-- ══════════ FORM PAGE ══════════ -->
@@ -1406,30 +1406,56 @@ function copyJSONta(){
   doClipboard(ta.value,'JSON copiato! Il collega lo incolla nella tab Importa.');
 }
 
-// ── HTML: condivide il file app completo come file .html ──
+// ── Condividi APP al Collega via WhatsApp ──
 function shareHTML(){
-  const d=_shareData;
-  // Leggi l'HTML dell'intera pagina corrente
-  const htmlContent=document.documentElement.outerHTML;
-  const blob=new Blob([htmlContent],{type:'text/html'});
-  const filename=`Consumabili_${(d.carr||'app').replace(/[^a-zA-Z0-9\-]/g,'_')}.html`;
-
-  if(navigator.share && navigator.canShare && navigator.canShare({files:[new File([blob],filename,{type:'text/html'})]})){
-    // Android supporta la condivisione file
-    const file=new File([blob],filename,{type:'text/html'});
-    navigator.share({
-      title:'FlightLog App',
-      text:'Apri questo file nel browser per usare FlightLog',
-      files:[file]
-    }).catch(e=>{
-      if(e.name!=='AbortError') downloadHTML(blob,filename);
-    });
+  const msg='\u2708 Consumabili EFA\nhttps://qra4efa.github.io/flightlog';
+  const waUrl='https://wa.me/?text='+encodeURIComponent(msg);
+  if(navigator.share){
+    navigator.share({title:'Consumabili EFA',text:msg})
+      .catch(e=>{ if(e.name!=='AbortError') window.open(waUrl,'_blank'); });
   } else {
-    // Fallback: scarica il file (poi il collega lo invia manualmente)
-    downloadHTML(blob,filename);
+    window.open(waUrl,'_blank');
   }
 }
 
+// ── Condividi File Tecnici (JSON package) ──
+function shareDocFiles(){
+  if(!docsLoaded()){
+    showToast('\uD83D\uDD12 Files Tecnici non installati',2000);
+    return;
+  }
+  const pkg={};
+  DOC_KEYS.forEach(k=>{ pkg[k]=localStorage.getItem('efa_img_'+k)||''; });
+  const blob=new Blob([JSON.stringify(pkg)],{type:'application/json'});
+  const filename='EFA_Docs_Package.json';
+  const file=new File([blob],filename,{type:'application/json'});
+  const txt='\u2708 EFA Docs Package\nInstalla su Consumabili EFA:\napri l\x27app > Installa Files Tecnici\n\nhttps://qra4efa.github.io/flightlog';
+  if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+    navigator.share({title:'EFA Docs Package',text:txt,files:[file]})
+      .then(()=>showToast('\u2705 File condiviso',1500))
+      .catch(e=>{ if(e.name!=='AbortError') _downloadDocJson(blob,filename); });
+    return;
+  }
+  if(navigator.share){
+    _downloadDocJson(blob,filename);
+    setTimeout(()=>{ navigator.share({title:'EFA Docs Package',text:txt}).catch(()=>{}); },900);
+    showToast('\uD83D\uDCE5 Scaricato \u2014 allega da WhatsApp',2800);
+    return;
+  }
+  _downloadDocJson(blob,filename);
+}
+
+function _downloadDocJson(blob,filename){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+  showToast('\uD83D\uDCE5 '+filename+' scaricato',2000);
+}
+
+// ── legacy downloadHTML (non più usato) ──
 function downloadHTML(blob,filename){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -1437,7 +1463,6 @@ function downloadHTML(blob,filename){
   document.body.appendChild(a);a.click();
   document.body.removeChild(a);
   setTimeout(()=>URL.revokeObjectURL(url),2000);
-  alert(`File "${filename}" scaricato.\nInvialo ai colleghi via WhatsApp — potranno aprirlo nel browser.`);
 }
 
 // ── QR code ──
@@ -1551,7 +1576,7 @@ function resetForm(){
 // ══════════════════════════════════════════
 //  APP CONSTANTS
 // ══════════════════════════════════════════
-const APP_VER     = '4.0';
+const APP_VER = '6.0';
 const APP_BASE_URL= 'https://qra4efa.github.io/flightlog/';
 
 // ══════════════════════════════════════════
@@ -1909,26 +1934,43 @@ function installPWA(){
 //  CHECK FOR UPDATE
 // ══════════════════════════════════════════
 // Auto-check on startup
+function verGt(a,b){
+  // Compare version strings numerically: '5.10' > '5.9' = true
+  const pa=a.split('.').map(Number);
+  const pb=b.split('.').map(Number);
+  for(let i=0;i<Math.max(pa.length,pb.length);i++){
+    const na=pa[i]||0, nb=pb[i]||0;
+    if(na>nb) return true;
+    if(na<nb) return false;
+  }
+  return false;
+}
+let _updateChecked=false;
+let _blinkUpdateIv=null;
+function startUpdateBlink(){
+  // Blink infinito su update-btn finché non aggiornato
+  if(_blinkUpdateIv) return;
+  _blinkUpdateIv=setInterval(()=>{
+    const b=document.getElementById('update-btn');
+    if(!b){ clearInterval(_blinkUpdateIv); _blinkUpdateIv=null; return; }
+    b.style.background=b.style.background?'':'rgba(255,200,0,.3)';
+    b.style.color=b.style.color?'':'var(--yellow)';
+    b.style.borderColor=b.style.borderColor?'':'rgba(255,200,0,.5)';
+  },700);
+}
 async function autoCheckUpdate(){
+  if(_updateChecked) return;
+  _updateChecked=true;
   try{
     const r=await fetch('https://raw.githubusercontent.com/qra4efa/flightlog/main/index.html?t='+Date.now());
     if(!r.ok) return;
-    const t=await r.text();
-    const m=t.match(/class="ver">([\d.]+)<\/span>/);
+    const txt=await r.text();
+    const m=txt.match(/class="ver">([0-9.]+)<\/span>/);
     if(!m) return;
-    if(m[1]!==APP_VER && m[1]>APP_VER){
-      showToast('⚠ App v'+m[1]+' disponibile — aggiorna!',3000);
-      // Blink update buttons until user sees it
-      let blinkCount=0;
-      const biv=setInterval(()=>{
-        blinkCount++;
-        ['update-btn','update-btn2'].forEach(id=>{
-          const b=document.getElementById(id);
-          if(b) b.style.background=blinkCount%2?'rgba(255,200,0,.2)':'';
-        });
-        if(blinkCount>20) clearInterval(biv); // stop after 10 sec
-      },500);
-      localStorage.setItem('efa_update_available',m[1]);
+    const rv=m[1];
+    if(verGt(rv, APP_VER)){
+      showToast('⬆ App v'+rv+' disponibile → premi Aggiorna APP', 4000);
+      startUpdateBlink();
     }
   }catch(e){}
 }
@@ -1945,36 +1987,38 @@ async function checkForUpdate(){
     if(!m) throw new Error('no version');
     const rv=m[1];
     msg.style.display='block';
-    if(rv===APP_VER){
-      Object.assign(msg.style,{background:'rgba(0,180,80,.1)',color:'var(--green)',border:'1px solid var(--green)'});
-      msg.textContent='\u2705 Versione aggiornata ('+APP_VER+')';
-    } else {
+    if(verGt(rv, APP_VER)){
       Object.assign(msg.style,{background:'rgba(255,200,0,.1)',color:'var(--yellow)',border:'1px solid var(--yellow)'});
       msg.innerHTML='\u26a0 Disponibile v'+rv+' (hai v'+APP_VER+'). <a href="'+APP_BASE_URL+'" target="_blank" style="color:var(--accent)">Aggiorna \u2192</a>';
+      startUpdateBlink();
+    } else {
+      // Versione già aggiornata: ferma eventuale blink
+      if(_blinkUpdateIv){ clearInterval(_blinkUpdateIv); _blinkUpdateIv=null; }
+      btn.style.background=''; btn.style.color=''; btn.style.borderColor='';
+      Object.assign(msg.style,{background:'rgba(0,180,80,.1)',color:'var(--green)',border:'1px solid var(--green)'});
+      msg.textContent='\u2705 Versione aggiornata ('+APP_VER+')';
     }
   }catch(e){
     msg.style.display='block';
     Object.assign(msg.style,{background:'rgba(100,120,160,.1)',color:'var(--muted)',border:'1px solid var(--border)'});
     msg.textContent='Controllo non disponibile (offline o app locale)';
   }
-  btn.textContent='\U0001f504 Aggiornamenti'; btn.disabled=false;
+  btn.textContent='🔄 Aggiornamenti'; btn.disabled=false;
 }
 
 // ══════════════════════════════════════════
 //  SSL MODAL
 // ══════════════════════════════════════════
-function openSSL(){
-  const m=document.getElementById('ssl-modal');
-  if(m) m.style.display='flex';
+function openDocModal(modalId, key){
+  if(!localStorage.getItem('efa_img_'+key)){
+    showToast('🔒 File non installato — usa Richiedi/Installa Files Tecnici in fondo alla Home', 3500);
+    return;
+  }
+  document.getElementById(modalId).style.display='flex';
 }
-function openSeeIn(){
-  const m=document.getElementById('seein-modal');
-  if(m) m.style.display='flex';
-}
-function openSeeOff(){
-  const m=document.getElementById('seeoff-modal');
-  if(m) m.style.display='flex';
-}
+function openSSL(){   openDocModal('ssl-modal',   'ssl_img');   }
+function openSeeIn(){ openDocModal('seein-modal',  'seein_img'); }
+function openSeeOff(){ openDocModal('seeoff-modal', 'seeoff_img'); }
 
 // ══════════════════════════════════════════
 //  INIT
@@ -2037,7 +2081,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       loadIntoForm(rec);
     }
   }
-  setTimeout(()=>focusFlowField('f-carr'),400);
+  setTimeout(()=>{ if(typeof setTipo==='function') setTipo('BF'); focusFlowField('f-carr'); },400);
   setTimeout(autoCheckUpdate, 2000); // check update after 2s
   loadSavedImgs();
 });
@@ -2090,8 +2134,19 @@ function renderDocMgmt(){
   const shareApp='<button onclick="shareHTML()" style="'+bs+
     'background:rgba(0,212,240,.12);border:1px solid rgba(0,212,240,.3);'+
     'color:var(--accent);">\u2708 Condividi APP al Collega</button>';
+  const shareDocsBtn='<button onclick="shareDocFiles()" style="'+bs+
+    'background:rgba(255,160,0,.12);border:1px solid rgba(255,160,0,.4);'+
+    'color:var(--orange);">\uD83D\uDCC4 Condividi File Tecnici</button>';
   if(docsLoaded()){
-    el.innerHTML=title+shareApp+
+    el.innerHTML=title+
+      '<div style="display:flex;gap:6px;margin-bottom:6px;">'+
+        '<button onclick="shareHTML()" style="flex:1;'+bs+
+          'background:rgba(0,212,240,.12);border:1px solid rgba(0,212,240,.3);'+
+          'color:var(--accent);margin-bottom:0;">\u2708 Condividi APP</button>'+
+        '<button onclick="shareDocFiles()" style="flex:1;'+bs+
+          'background:rgba(255,160,0,.12);border:1px solid rgba(255,160,0,.4);'+
+          'color:var(--orange);margin-bottom:0;">\uD83D\uDCC4 Files Tecnici</button>'+
+      '</div>'+
       '<button onclick="deleteAllDocs()" style="'+bs+
       'background:rgba(255,32,64,.08);border:1px solid rgba(255,32,64,.25);'+
       'color:var(--red);">\uD83D\uDDD1 Rimuovi Files Tecnici</button>';
@@ -2111,7 +2166,7 @@ function renderDocMgmt(){
   }
   // Sync theme btn text
   const tb=document.getElementById('theme-btn2');
-  if(tb) tb.textContent=document.body.classList.contains('dark')?'\u2600 Light Mode':'\U0001f319 Dark Mode';
+  if(tb) tb.textContent=document.body.classList.contains('dark')?'\u2600 Light Mode':'🌙 Dark Mode';
 }
 
 function openSpikAdRequest(){
@@ -2178,9 +2233,7 @@ function deleteAllDocs(){
   DOC_KEYS.forEach(k=>{
     const mid=DOC_MODAL_MAP[k];
     const img=document.getElementById(mid+'_img');
-    const nl=document.getElementById(mid+'_notloaded');
     if(img){img.src='';img.style.display='none';}
-    if(nl) nl.style.display='block';
   });
   renderDocMgmt();
   showToast('🗑 Documenti rimossi',1500);
@@ -2196,9 +2249,7 @@ function loadSavedImgs(){
 
 function showLoadedImg(key, modalId, data){
   const img=document.getElementById(modalId+'_img');
-  const nl=document.getElementById(modalId+'_notloaded');
   if(img){img.src=data;img.style.display='block';}
-  if(nl) nl.style.display='none';
   // Color the doc button orange when file is loaded
   const btnMap={'ssl_img':'btn-ssl','seein_img':'btn-seein','seeoff_img':'btn-seeoff'};
   const btn=document.getElementById(btnMap[key]);
@@ -2248,143 +2299,37 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 
 
 <!-- SEE-IN MODAL -->
-<div id="seein-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.93);flex-direction:column;">
-  <div style="display:flex;align-items:center;padding:10px 14px 4px;gap:10px;">
-    <span style="flex:1;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;">MDP NOGO — SEE-IN</span>
-    <button onclick="document.getElementById('seein-modal').style.display='none'" style="background:transparent;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1;">✕</button>
-  </div>
-  <div style="flex:1;overflow:auto;padding:0 6px 20px;-webkit-overflow-scrolling:touch;">
-    <div id="seein-modal_img_wrap">
-  <div id="seein-modal_placeholder" style="padding:24px 16px;text-align:center;color:rgba(255,255,255,.6);">
-    <div style="font-size:40px;margin-bottom:12px;">📂</div>
-    <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:20px;line-height:1.6;">
-      <strong style="color:#00d4f0;">MDP NOGO SEE-IN</strong><br>
-      File non presente sul dispositivo.
-    </div>
-    <!-- STEP 1: request via WhatsApp/SpikAd -->
-    <div id="seein-modal_step1" style="margin-bottom:16px;">
-      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">Passo 1 — Richiedi il file</div>
-      <button onclick="requestDoc('MDP NOGO SEE-IN','wa')" style="display:block;width:100%;background:#25D366;border:none;border-radius:8px;color:#fff;padding:11px;font-size:12px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer;margin-bottom:8px;">
-        📲 Richiedi su WhatsApp
-      </button>
-      <button onclick="requestDoc('MDP NOGO SEE-IN','spikad')" style="display:block;width:100%;background:rgba(0,212,240,.2);border:1px solid rgba(0,212,240,.4);border-radius:8px;color:#00d4f0;padding:11px;font-size:12px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer;">
-        ✈ Richiedi su SpikAd
-      </button>
-    </div>
-    <!-- STEP 2: import received file -->
-    <div id="seein-modal_step2" style="border-top:1px solid rgba(255,255,255,.1);padding-top:16px;">
-      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">Passo 2 — Importa il file ricevuto</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:12px;line-height:1.5;">
-        Ricevuto il file PNG via WhatsApp o SpikAd,<br>salvalo sul dispositivo poi premere qui sotto:
-      </div>
-      <label style="display:block;background:rgba(0,212,240,.15);border:1px solid rgba(0,212,240,.4);border-radius:8px;padding:11px;font-size:12px;color:#00d4f0;cursor:pointer;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;">
-        📥 Carica file ricevuto
-        <input type="file" accept="image/*" style="display:none" onchange="loadImgFile(this,'seein_img','seein-modal')">
-      </label>
-    </div>
-  </div>
-    <img id="seein-modal_img" src="" style="width:100%;height:auto;display:none;border-radius:6px;" alt="MDP NOGO SEE-IN">
-</div>
-  </div>
-</div>
-
-<!-- SEE-OFF MODAL -->
-<div id="seeoff-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.93);flex-direction:column;">
-  <div style="display:flex;align-items:center;padding:10px 14px 4px;gap:10px;">
-    <span style="flex:1;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;">MDP NOGO — SEE-OFF</span>
-    <button onclick="document.getElementById('seeoff-modal').style.display='none'" style="background:transparent;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1;">✕</button>
-  </div>
-  <div style="flex:1;overflow:auto;padding:0 6px 20px;-webkit-overflow-scrolling:touch;">
-    <div id="seeoff-modal_img_wrap">
-  <div id="seeoff-modal_placeholder" style="padding:24px 16px;text-align:center;color:rgba(255,255,255,.6);">
-    <div style="font-size:40px;margin-bottom:12px;">📂</div>
-    <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:20px;line-height:1.6;">
-      <strong style="color:#00d4f0;">MDP NOGO SEE-OFF</strong><br>
-      File non presente sul dispositivo.
-    </div>
-    <!-- STEP 1: request via WhatsApp/SpikAd -->
-    <div id="seeoff-modal_step1" style="margin-bottom:16px;">
-      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">Passo 1 — Richiedi il file</div>
-      <button onclick="requestDoc('MDP NOGO SEE-OFF','wa')" style="display:block;width:100%;background:#25D366;border:none;border-radius:8px;color:#fff;padding:11px;font-size:12px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer;margin-bottom:8px;">
-        📲 Richiedi su WhatsApp
-      </button>
-      <button onclick="requestDoc('MDP NOGO SEE-OFF','spikad')" style="display:block;width:100%;background:rgba(0,212,240,.2);border:1px solid rgba(0,212,240,.4);border-radius:8px;color:#00d4f0;padding:11px;font-size:12px;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer;">
-        ✈ Richiedi su SpikAd
-      </button>
-    </div>
-    <!-- STEP 2: import received file -->
-    <div id="seeoff-modal_step2" style="border-top:1px solid rgba(255,255,255,.1);padding-top:16px;">
-      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;">Passo 2 — Importa il file ricevuto</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:12px;line-height:1.5;">
-        Ricevuto il file PNG via WhatsApp o SpikAd,<br>salvalo sul dispositivo poi premere qui sotto:
-      </div>
-      <label style="display:block;background:rgba(0,212,240,.15);border:1px solid rgba(0,212,240,.4);border-radius:8px;padding:11px;font-size:12px;color:#00d4f0;cursor:pointer;font-family:'Exo 2',sans-serif;font-weight:700;letter-spacing:1px;">
-        📥 Carica file ricevuto
-        <input type="file" accept="image/*" style="display:none" onchange="loadImgFile(this,'seeoff_img','seeoff-modal')">
-      </label>
-    </div>
-  </div>
-    <img id="seeoff-modal_img" src="" style="width:100%;height:auto;display:none;border-radius:6px;" alt="MDP NOGO SEE-OFF">
-</div>
-  </div>
-</div>
-
-<!-- TOAST --><div class="toast" id="toast"></div>
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <div class="bnav-row">
-    <button class="bnav-tab active" onclick="newForm()" id="tab-form"><span class="bnav-ico">+</span><span class="bnav-lbl">Nuovo</span></button>
-    <button class="bnav-tab" onclick="openShare()" id="bnav-share"><span class="bnav-ico">✈</span><span class="bnav-lbl">Condividi</span></button>
-    <button class="bnav-tab bnav-jump" onclick="doJump()" id="bnav-jump" title="Campo successivo"><span class="bnav-ico">↵</span><span class="bnav-lbl">Jump</span></button>
-  </div>
-  <div class="bnav-row">
-    <button class="bnav-tab" onclick="silentSave()" id="bnav-save"><span class="bnav-ico">💾</span><span class="bnav-lbl">Salva</span></button>
-    <button class="bnav-tab" onclick="showPage('archive')" id="tab-archive"><span class="bnav-ico">🗂 <span class="badge" id="arch-badge" style="vertical-align:middle;"></span></span><span class="bnav-lbl">Archivio</span></button>
-  </div>
-</div>
 <!-- SSL MODAL -->
-<div id="ssl-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.93);flex-direction:column;">
-  <div style="display:flex;justify-content:flex-end;padding:10px 14px 4px;">
+<div id="ssl-modal" style="display:none;position:fixed;inset:0;z-index:300;background:#000;flex-direction:column;">
+  <div style="display:flex;align-items:center;padding:10px 14px 6px;gap:10px;background:rgba(0,0,0,.8);">
+    <span style="flex:1;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;">SSL — Sinno Stegni List</span>
     <button onclick="document.getElementById('ssl-modal').style.display='none'" style="background:transparent;border:none;color:#fff;font-size:30px;cursor:pointer;line-height:1;">✕</button>
   </div>
-    <div style="flex:1;overflow:auto;padding:0 6px 20px;-webkit-overflow-scrolling:touch;">
-    <div id="ssl-modal_notloaded" style="padding:30px 16px;text-align:center;color:rgba(255,255,255,.5);display:block;">
-      <div style="font-size:36px;margin-bottom:12px;">📂</div>
-      <div style="font-size:13px;line-height:1.6;margin-bottom:16px;"><strong style="color:#00d4f0;">SSL — Sinno Stegni List</strong><br>non ancora importato.</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.35);">Torna alla Home e usa il pulsante<br><strong style="color:rgba(0,212,240,.6);">📥 Importa Documenti</strong></div>
-    </div>
-    <img id="ssl-modal_img" src="" style="width:100%;height:auto;display:none;border-radius:6px;" alt="SSL — Sinno Stegni List">
+  <div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;">
+    <img id="ssl-modal_img" src="" style="width:100%;height:auto;display:block;" alt="SSL">
   </div>
 </div>
 <!-- SEE-IN MODAL -->
-<div id="seein-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.93);flex-direction:column;">
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px 4px;">
-    <span style="color:#fff;font-size:13px;font-weight:700;letter-spacing:1px;">MDP NOGO SEE-IN LIST</span>
+<div id="seein-modal" style="display:none;position:fixed;inset:0;z-index:300;background:#000;flex-direction:column;">
+  <div style="display:flex;align-items:center;padding:10px 14px 6px;gap:10px;background:rgba(0,0,0,.8);">
+    <span style="flex:1;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;">MDP NOGO — SEE-IN</span>
     <button onclick="document.getElementById('seein-modal').style.display='none'" style="background:transparent;border:none;color:#fff;font-size:30px;cursor:pointer;line-height:1;">✕</button>
   </div>
-    <div style="flex:1;overflow:auto;padding:0 6px 20px;-webkit-overflow-scrolling:touch;">
-    <div id="seein-modal_notloaded" style="padding:30px 16px;text-align:center;color:rgba(255,255,255,.5);display:block;">
-      <div style="font-size:36px;margin-bottom:12px;">📂</div>
-      <div style="font-size:13px;line-height:1.6;margin-bottom:16px;"><strong style="color:#00d4f0;">MDP NOGO SEE-IN</strong><br>non ancora importato.</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.35);">Torna alla Home e usa il pulsante<br><strong style="color:rgba(0,212,240,.6);">📥 Importa Documenti</strong></div>
-    </div>
-    <img id="seein-modal_img" src="" style="width:100%;height:auto;display:none;border-radius:6px;" alt="MDP NOGO SEE-IN">
+  <div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;">
+    <img id="seein-modal_img" src="" style="width:100%;height:auto;display:block;" alt="SEE-IN">
   </div>
 </div>
 <!-- SEE-OFF MODAL -->
-<div id="seeoff-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.93);flex-direction:column;">
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px 4px;">
-    <span style="color:#fff;font-size:13px;font-weight:700;letter-spacing:1px;">MDP NOGO SEE-OFF LIST</span>
+<div id="seeoff-modal" style="display:none;position:fixed;inset:0;z-index:300;background:#000;flex-direction:column;">
+  <div style="display:flex;align-items:center;padding:10px 14px 6px;gap:10px;background:rgba(0,0,0,.8);">
+    <span style="flex:1;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;">MDP NOGO — SEE-OFF</span>
     <button onclick="document.getElementById('seeoff-modal').style.display='none'" style="background:transparent;border:none;color:#fff;font-size:30px;cursor:pointer;line-height:1;">✕</button>
   </div>
-    <div style="flex:1;overflow:auto;padding:0 6px 20px;-webkit-overflow-scrolling:touch;">
-    <div id="seeoff-modal_notloaded" style="padding:30px 16px;text-align:center;color:rgba(255,255,255,.5);display:block;">
-      <div style="font-size:36px;margin-bottom:12px;">📂</div>
-      <div style="font-size:13px;line-height:1.6;margin-bottom:16px;"><strong style="color:#00d4f0;">MDP NOGO SEE-OFF</strong><br>non ancora importato.</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.35);">Torna alla Home e usa il pulsante<br><strong style="color:rgba(0,212,240,.6);">📥 Importa Documenti</strong></div>
-    </div>
-    <img id="seeoff-modal_img" src="" style="width:100%;height:auto;display:none;border-radius:6px;" alt="MDP NOGO SEE-OFF">
+  <div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;">
+    <img id="seeoff-modal_img" src="" style="width:100%;height:auto;display:block;" alt="SEE-OFF">
   </div>
+</div>
 
 </body>
+
 </html>
