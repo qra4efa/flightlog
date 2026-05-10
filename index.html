@@ -268,7 +268,7 @@ body.dark .preview-block b{color:#fff;}
 </head>
 <body>
 
-<div class="app-headline">Consumabili EFA — skappa <span class="ver">6.0</span></div>
+<div class="app-headline">Consumabili EFA — skappa <span class="ver">6.6</span></div>
 
 
 <!-- ══════════ FORM PAGE ══════════ -->
@@ -1418,7 +1418,7 @@ function shareHTML(){
   }
 }
 
-// ── Condividi File Tecnici (JSON package) ──
+// ── Condividi Files Tecnici (JSON package) ──
 function shareDocFiles(){
   if(!docsLoaded()){
     showToast('\uD83D\uDD12 Files Tecnici non installati',2000);
@@ -1426,23 +1426,29 @@ function shareDocFiles(){
   }
   const pkg={};
   DOC_KEYS.forEach(k=>{ pkg[k]=localStorage.getItem('efa_img_'+k)||''; });
-  const blob=new Blob([JSON.stringify(pkg)],{type:'application/json'});
+  const jsonStr=JSON.stringify(pkg);
   const filename='EFA_Docs_Package.json';
-  const file=new File([blob],filename,{type:'application/json'});
-  const txt='\u2708 EFA Docs Package\nInstalla su Consumabili EFA:\napri l\x27app > Installa Files Tecnici\n\nhttps://qra4efa.github.io/flightlog';
-  if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
-    navigator.share({title:'EFA Docs Package',text:txt,files:[file]})
-      .then(()=>showToast('\u2705 File condiviso',1500))
-      .catch(e=>{ if(e.name!=='AbortError') _downloadDocJson(blob,filename); });
-    return;
+  const txt='\u2708 EFA Docs Package\nInstalla su Consumabili EFA:\napri l\x27app > in fondo alla Home > Installa Files Tecnici\n\nhttps://qra4efa.github.io/flightlog';
+  // Prova MIME types — apre pannello nativo, utente sceglie app
+  const mimeList=['application/octet-stream','application/json','text/plain'];
+  let shareFile=null;
+  for(const mime of mimeList){
+    try{
+      const b=new Blob([jsonStr],{type:mime});
+      const f=new File([b],filename,{type:mime});
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[f]})){
+        shareFile=f; break;
+      }
+    }catch(e){}
   }
-  if(navigator.share){
-    _downloadDocJson(blob,filename);
-    setTimeout(()=>{ navigator.share({title:'EFA Docs Package',text:txt}).catch(()=>{}); },900);
-    showToast('\uD83D\uDCE5 Scaricato \u2014 allega da WhatsApp',2800);
-    return;
+  if(shareFile){
+    navigator.share({title:'EFA Docs Package',text:txt,files:[shareFile]})
+      .then(()=>showToast('\u2705 Condivisione completata',1500))
+      .catch(e=>{ if(e.name!=='AbortError') _downloadDocJson(new Blob([jsonStr],{type:'application/octet-stream'}),filename); });
+  } else {
+    _downloadDocJson(new Blob([jsonStr],{type:'application/octet-stream'}),filename);
+    showToast('\uD83D\uDCE5 '+filename+' scaricato',2000);
   }
-  _downloadDocJson(blob,filename);
 }
 
 function _downloadDocJson(blob,filename){
@@ -1576,7 +1582,7 @@ function resetForm(){
 // ══════════════════════════════════════════
 //  APP CONSTANTS
 // ══════════════════════════════════════════
-const APP_VER = '6.0';
+const APP_VER = '6.6';
 const APP_BASE_URL= 'https://qra4efa.github.io/flightlog/';
 
 // ══════════════════════════════════════════
@@ -1978,6 +1984,7 @@ async function autoCheckUpdate(){
 async function checkForUpdate(){
   const btn=document.getElementById('update-btn');
   const msg=document.getElementById('update-msg');
+  if(!btn||!msg) return;
   btn.textContent='\u23f3 Controllo…'; btn.disabled=true;
   try{
     const r=await fetch('https://raw.githubusercontent.com/qra4efa/flightlog/main/index.html?t='+Date.now());
@@ -2011,14 +2018,28 @@ async function checkForUpdate(){
 // ══════════════════════════════════════════
 function openDocModal(modalId, key){
   if(!localStorage.getItem('efa_img_'+key)){
-    showToast('🔒 File non installato — usa Richiedi/Installa Files Tecnici in fondo alla Home', 3500);
+    showToast('\uD83D\uDD12 File non installato — usa Richiedi/Installa Files Tecnici in fondo alla Home', 3500);
     return;
   }
   document.getElementById(modalId).style.display='flex';
+  history.pushState({modal:modalId}, '');
+}
+function closeDocModal(modalId){
+  document.getElementById(modalId).style.display='none';
+  if(history.state && history.state.modal===modalId) history.back();
 }
 function openSSL(){   openDocModal('ssl-modal',   'ssl_img');   }
 function openSeeIn(){ openDocModal('seein-modal',  'seein_img'); }
 function openSeeOff(){ openDocModal('seeoff-modal', 'seeoff_img'); }
+
+// Back button chiude il modal aperto invece di uscire dall'app
+window.addEventListener('popstate', function(e){
+  const modals = ['ssl-modal','seein-modal','seeoff-modal'];
+  modals.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el && el.style.display==='flex') el.style.display='none';
+  });
+});
 
 // ══════════════════════════════════════════
 //  INIT
@@ -2136,7 +2157,7 @@ function renderDocMgmt(){
     'color:var(--accent);">\u2708 Condividi APP al Collega</button>';
   const shareDocsBtn='<button onclick="shareDocFiles()" style="'+bs+
     'background:rgba(255,160,0,.12);border:1px solid rgba(255,160,0,.4);'+
-    'color:var(--orange);">\uD83D\uDCC4 Condividi File Tecnici</button>';
+    'color:var(--orange);">\uD83D\uDCC4 Condividi Files Tecnici</button>';
   if(docsLoaded()){
     el.innerHTML=title+
       '<div style="display:flex;gap:6px;margin-bottom:6px;">'+
@@ -2145,7 +2166,7 @@ function renderDocMgmt(){
           'color:var(--accent);margin-bottom:0;">\u2708 Condividi APP</button>'+
         '<button onclick="shareDocFiles()" style="flex:1;'+bs+
           'background:rgba(255,160,0,.12);border:1px solid rgba(255,160,0,.4);'+
-          'color:var(--orange);margin-bottom:0;">\uD83D\uDCC4 Files Tecnici</button>'+
+          'color:var(--orange);margin-bottom:0;">\uD83D\uDCC4 Condividi Files Tecnici</button>'+
       '</div>'+
       '<button onclick="deleteAllDocs()" style="'+bs+
       'background:rgba(255,32,64,.08);border:1px solid rgba(255,32,64,.25);'+
@@ -2303,33 +2324,46 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 <div id="ssl-modal" style="display:none;position:fixed;inset:0;z-index:300;background:#000;flex-direction:column;">
   <div style="display:flex;align-items:center;padding:10px 14px 6px;gap:10px;background:rgba(0,0,0,.8);">
     <span style="flex:1;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;">SSL — Sinno Stegni List</span>
-    <button onclick="document.getElementById('ssl-modal').style.display='none'" style="background:transparent;border:none;color:#fff;font-size:30px;cursor:pointer;line-height:1;">✕</button>
+    <button onclick="closeDocModal('ssl-modal')" style="background:transparent;border:none;color:#fff;font-size:30px;cursor:pointer;line-height:1;">✕</button>
   </div>
   <div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;">
-    <img id="ssl-modal_img" src="" style="width:100%;height:auto;display:block;" alt="SSL">
+    <img id="ssl-modal_img" src="" style="width:100%;height:auto;display:none;" alt="SSL">
   </div>
 </div>
 <!-- SEE-IN MODAL -->
 <div id="seein-modal" style="display:none;position:fixed;inset:0;z-index:300;background:#000;flex-direction:column;">
   <div style="display:flex;align-items:center;padding:10px 14px 6px;gap:10px;background:rgba(0,0,0,.8);">
     <span style="flex:1;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;">MDP NOGO — SEE-IN</span>
-    <button onclick="document.getElementById('seein-modal').style.display='none'" style="background:transparent;border:none;color:#fff;font-size:30px;cursor:pointer;line-height:1;">✕</button>
+    <button onclick="closeDocModal('seein-modal')" style="background:transparent;border:none;color:#fff;font-size:30px;cursor:pointer;line-height:1;">✕</button>
   </div>
   <div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;">
-    <img id="seein-modal_img" src="" style="width:100%;height:auto;display:block;" alt="SEE-IN">
+    <img id="seein-modal_img" src="" style="width:100%;height:auto;display:none;" alt="SEE-IN">
   </div>
 </div>
 <!-- SEE-OFF MODAL -->
 <div id="seeoff-modal" style="display:none;position:fixed;inset:0;z-index:300;background:#000;flex-direction:column;">
   <div style="display:flex;align-items:center;padding:10px 14px 6px;gap:10px;background:rgba(0,0,0,.8);">
     <span style="flex:1;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;">MDP NOGO — SEE-OFF</span>
-    <button onclick="document.getElementById('seeoff-modal').style.display='none'" style="background:transparent;border:none;color:#fff;font-size:30px;cursor:pointer;line-height:1;">✕</button>
+    <button onclick="closeDocModal('seeoff-modal')" style="background:transparent;border:none;color:#fff;font-size:30px;cursor:pointer;line-height:1;">✕</button>
   </div>
   <div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;">
-    <img id="seeoff-modal_img" src="" style="width:100%;height:auto;display:block;" alt="SEE-OFF">
+    <img id="seeoff-modal_img" src="" style="width:100%;height:auto;display:none;" alt="SEE-OFF">
   </div>
 </div>
 
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bnav-row">
+    <button class="bnav-tab active" onclick="newForm()" id="tab-form"><span class="bnav-ico">+</span><span class="bnav-lbl">Nuovo</span></button>
+    <button class="bnav-tab" onclick="openShare()" id="bnav-share"><span class="bnav-ico">✈</span><span class="bnav-lbl">Condividi</span></button>
+    <button class="bnav-tab bnav-jump" onclick="doJump()" id="bnav-jump" title="Campo successivo"><span class="bnav-ico">↵</span><span class="bnav-lbl">Jump</span></button>
+  </div>
+  <div class="bnav-row">
+    <button class="bnav-tab" onclick="silentSave()" id="bnav-save"><span class="bnav-ico">💾</span><span class="bnav-lbl">Salva</span></button>
+    <button class="bnav-tab" onclick="showPage('archive')" id="tab-archive"><span class="bnav-ico">🗂 <span class="badge" id="arch-badge" style="vertical-align:middle;"></span></span><span class="bnav-lbl">Archivio</span></button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
 </body>
 
 </html>
