@@ -268,7 +268,7 @@ body.dark .preview-block b{color:#fff;}
 </head>
 <body>
 
-<div class="app-headline">Consumabili EFA — skappa <span class="ver">6.7</span></div>
+<div class="app-headline">Consumabili EFA — skappa <span class="ver">6.8</span></div>
 
 
 <!-- ══════════ FORM PAGE ══════════ -->
@@ -1453,8 +1453,8 @@ function shareDocFiles(){
   const pkg={};
   DOC_KEYS.forEach(k=>{ pkg[k]=localStorage.getItem('efa_img_'+k)||''; });
   const jsonStr=JSON.stringify(pkg);
-  const filename='EFA_Docs_Package.json';
-  const txt='\u2708 EFA Docs Package\nInstalla su Consumabili EFA:\napri l\x27app > in fondo alla Home > Installa Files Tecnici\n\nhttps://qra4efa.github.io/flightlog';
+  const filename='EFA_Docs_Package.txt';
+  const txt='\u2708 EFA Docs Package\nInstalla su Consumabili EFA:\napri l\x27app > in fondo alla Home > Installa Files Tecnici\n(seleziona EFA_Docs_Package.txt)\n\nhttps://qra4efa.github.io/flightlog';
   // Prova MIME types — apre pannello nativo, utente sceglie app
   const mimeList=['application/octet-stream','application/json','text/plain'];
   let shareFile=null;
@@ -1608,7 +1608,7 @@ function resetForm(){
 // ══════════════════════════════════════════
 //  APP CONSTANTS
 // ══════════════════════════════════════════
-const APP_VER = '6.7';
+const APP_VER = '6.8';
 const APP_BASE_URL= 'https://qra4efa.github.io/flightlog/';
 
 // ══════════════════════════════════════════
@@ -2207,7 +2207,7 @@ function renderDocMgmt(){
           'background:rgba(0,212,240,.04);border:1px solid rgba(0,212,240,.15);'+
           'color:var(--muted);">'+
           '\uD83D\uDCE5 Installa Files Tecnici'+
-          '<input type="file" accept=".zip,.json" style="display:none" onchange="importDocPackage(this)">'+
+          '<input type="file" accept=".zip,.json,.txt" style="display:none" onchange="importDocPackage(this)">'+
         '</label>'+
       '</div>';
   }
@@ -2223,7 +2223,7 @@ function openSpikAdRequest(){
     '✈ Richiesta pacchetto EFA Consumabili Docs',
     nick?'Richiedente: '+nick:'',
     'Dispositivo: '+device,
-    'Inviami EFA_Docs_Package.json per favore.'
+    'Inviami EFA_Docs_Package.txt per favore.'
   ].filter(Boolean);
   const url='https://wa.me/393346899607?text='+encodeURIComponent(lines.join('\n'));
   window.open(url,'_blank');
@@ -2233,7 +2233,7 @@ function importDocPackage(input){
   const file=input.files[0];
   if(!file){return;}
   const name=file.name.toLowerCase();
-  if(name.endsWith('.json')){
+  if(name.endsWith('.json')||name.endsWith('.txt')){
     // JSON package: {ssl_img:'data:...', seein_img:'data:...', seeoff_img:'data:...'}
     const reader=new FileReader();
     reader.onload=e=>{
