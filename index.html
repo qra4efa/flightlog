@@ -268,7 +268,7 @@ body.dark .preview-block b{color:#fff;}
 </head>
 <body>
 
-<div class="app-headline">Consumabili EFA — skappa <span class="ver">6.6</span></div>
+<div class="app-headline">Consumabili EFA — skappa <span class="ver">6.7</span></div>
 
 
 <!-- ══════════ FORM PAGE ══════════ -->
@@ -297,7 +297,7 @@ body.dark .preview-block b{color:#fff;}
         <label>Config.</label>
         <div class="seat-toggle">
           <button class="seat-btn am" id="btn-mono" onclick="setSeat('mono')">MONO</button>
-          <button class="seat-btn"    id="btn-bipo" onclick="setSeat('bipo')">BIPO</button>
+          <button class="seat-btn"    id="btn-bipo" onclick="cycleBipo()"><span id="bipo-lbl">BIPO</span></button>
         </div>
       </div>
       <div class="field" style="margin-bottom:0">
@@ -771,6 +771,27 @@ document.getElementById('f-carr').addEventListener('input', function(){
 // ══════════════════════════════════════════
 //  MONO/BIPO
 // ══════════════════════════════════════════
+function cycleBipo(){
+  const cur=document.getElementById('btn-bipo').classList;
+  if(!cur.contains('ab')){
+    // Primo tap: attiva BIPO con legatura 'both'
+    bipoLegIdx=0;
+    setSeat('bipo');
+  } else {
+    // Tap successivi: cicla la legatura senza cambiare modalità
+    bipoLegIdx=(bipoLegIdx+1)%3;
+    legaturaState=bipoLegStates[bipoLegIdx];
+    updateBipoLabel();
+  }
+}
+
+function updateBipoLabel(){
+  const lbl=document.getElementById('bipo-lbl');
+  if(!lbl) return;
+  const labels={both:'BIPO',solo:'BIPO — Solo',front:'BIPO — Front'};
+  lbl.textContent=labels[legaturaState]||'BIPO';
+}
+
 function setSeat(mode){
   seatConfig = mode;
   document.getElementById('btn-mono').className = 'seat-btn'+(mode==='mono'?' am':'');
@@ -778,15 +799,20 @@ function setSeat(mode){
   const bp=document.getElementById('oxy-bipo-block');
   const mw=document.getElementById('oxy-mono-wrap');
   const lr=document.getElementById('legatura-row');
+  // Legatura-row sempre nascosta — la legatura è nel label del pulsante BIPO
+  if(lr) lr.style.display='none';
   if(mode==='bipo'){
-    bp.classList.add('show');if(mw)mw.style.display='none';
-    if(lr)lr.style.display='block';
+    bipoLegIdx=0; legaturaState='both'; updateBipoLabel();
+    if(bp) bp.style.display='';
+    if(mw) mw.style.display='none';
   } else {
-    bp.classList.remove('show');if(mw)mw.style.display='block';
-    if(lr)lr.style.display='none';
-    setLegatura('both'); // reset to default
+    // MONO
+    bipoLegIdx=0; legaturaState='both';
+    const lbl=document.getElementById('bipo-lbl');
+    if(lbl) lbl.textContent='BIPO';
+    if(bp) bp.style.display='none';
+    if(mw) mw.style.display='';
   }
-  calcFuel();
 }
 
 // ══════════════════════════════════════════
@@ -1582,7 +1608,7 @@ function resetForm(){
 // ══════════════════════════════════════════
 //  APP CONSTANTS
 // ══════════════════════════════════════════
-const APP_VER = '6.6';
+const APP_VER = '6.7';
 const APP_BASE_URL= 'https://qra4efa.github.io/flightlog/';
 
 // ══════════════════════════════════════════
@@ -2293,6 +2319,8 @@ function loadImgFile(input, key, modalId){
 
 // ══ Legatura (BIPO only) ══
 let legaturaState = 'both';
+let bipoLegStates = ['both','solo','front'];
+let bipoLegIdx = 0;
 function setLegatura(val){
   legaturaState = val;
   ['both','solo','front'].forEach(v=>{
