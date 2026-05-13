@@ -1,0 +1,25 @@
+{
+  "name": "Consumabili EFA",
+  "short_name": "Consumabili",
+  "description": "Typhoon Crew Chief — scheda consumabili",
+  "start_url": "/flightlog/",
+  "scope": "/flightlog/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f2f5f9",
+  "theme_color": "#0090b0",
+  "icons": [
+    {
+      "src": "icon-192.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
