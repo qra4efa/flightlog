@@ -128,7 +128,8 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 .gn-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;}
 .gn-item{display:flex;flex-direction:column;gap:3px;}
 .gn-lbl{font-size:8px;font-weight:700;letter-spacing:.8px;color:var(--muted);text-transform:uppercase;text-align:center;padding:2px 0;}
-.gn-btn{width:100%;border:none;border-radius:5px;padding:7px 2px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Exo 2',sans-serif;transition:all .15s;}
+.gn-btn{width:100%;border:none;border-radius:5px;padding:6px 2px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Exo 2',sans-serif;transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.1;}
+.gn-sub{font-size:7px;font-weight:600;letter-spacing:.5px;opacity:.65;text-transform:uppercase;display:block;}
 .gn-btn.go  {background:rgba(0,232,122,.15);border:1px solid rgba(0,232,122,.3);color:var(--green);}
 .gn-btn.astina.nogo{background:rgba(255,32,64,.18);color:var(--red);border-color:rgba(255,32,64,.4);}
 .gn-btn.nogo{background:rgba(255,32,64,.06);border:1px solid rgba(255,32,64,.15);color:#4a2838;}
@@ -339,7 +340,8 @@ textarea{font-size:20px;min-height:70px;}
 
 /* GO/NOGO grid */
 .gn-lbl{font-size:10px;letter-spacing:1px;}
-.gn-btn{font-size:19px;padding:9px 2px;border-radius:6px;}
+.gn-btn{font-size:19px;padding:8px 2px;border-radius:6px;}
+.gn-sub{font-size:8px;}
 
 /* HYD unit label */
 .hyd-unit{font-size:11px;}
@@ -409,7 +411,7 @@ textarea{font-size:20px;min-height:70px;}
 
 <div class="app-headline" style="display:flex;align-items:center;justify-content:center;gap:8px;">
   <img src="data:image/jpeg;base64,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" alt="logo" style="width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;">
-  <span>Consumabili EFA — skappa <span class="ver">3.8</span></span>
+  <span>Consumabili EFA — skappa <span class="ver">4.1</span></span>
 </div>
 
 
@@ -459,49 +461,6 @@ textarea{font-size:20px;min-height:70px;}
         <button class="pill" onclick="setTipo('WA')"   id="pill-WA">WA</button>
       </div>
     </div>
-    <!-- Opzioni -->
-    <div class="field" style="margin-bottom:0">
-      <label>Maintenance</label>
-      <div class="opt-pill-row">
-        <button class="opt-pill" id="opt-AMC"   onclick="cycleOpt('AMC')">AMC</button>
-        <button class="opt-pill" id="opt-134"   onclick="cycleOpt('134')">134</button>
-        <button class="opt-pill" id="opt-265"   onclick="cycleOpt('265')">265</button>
-        <button class="opt-pill" id="opt-Para"  onclick="cycleOpt('Para')">Para</button>
-        <button class="opt-pill" id="opt-Ruota" onclick="cycleOpt('Ruota')">Ruota</button>
-        <button class="opt-pill" id="opt-BSD"   onclick="cycleOpt('BSD')">BSD</button>
-      </div>
-      <!-- Legatura: solo BIPO -->
-      <div class="cond" id="legatura-row" style="margin-top:6px;display:none;">
-        <label style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px;">Legatura</label>
-        <div style="display:flex;gap:5px;">
-          <button class="opt-pill" id="leg-both"  onclick="setLegatura('both')"  style="flex:1;">Both</button>
-          <button class="opt-pill" id="leg-solo"  onclick="setLegatura('solo')"  style="flex:1;">Solo</button>
-          <button class="opt-pill" id="leg-front" onclick="setLegatura('front')" style="flex:1;">Front</button>
-        </div>
-      </div>
-      <!-- Para sub-fields -->
-      <div class="cond" id="para-fields" style="margin-top:5px">
-        <div class="row2">
-          <div class="field" style="margin-bottom:0">
-            <label>Para — Rimosso</label>
-            <input type="text" id="f-para-rim" placeholder="—" autocomplete="off" oninput="saveParaSerial()">
-          </div>
-          <div class="field" style="margin-bottom:0">
-            <label>Para — Installato</label>
-            <input type="text" id="f-para-inst" placeholder="—" autocomplete="off" oninput="saveParaSerial()">
-          </div>
-        </div>
-      </div>
-      <!-- Ruota sub-fields -->
-      <div class="cond" id="ruota-fields" style="margin-top:5px">
-        <div class="mlg-row">
-          <button class="mlg-pill" id="mlg-NLG"   onclick="toggleMLG('NLG')">NLG</button>
-          <button class="mlg-pill" id="mlg-LHMLG" onclick="toggleMLG('LHMLG')">LH MLG</button>
-          <button class="mlg-pill" id="mlg-RHMLG" onclick="toggleMLG('RHMLG')">RH MLG</button>
-        </div>
-        <div id="ruota-sub-rows"></div>
-      </div>
-    </div>
   </div>
 
   <!-- CARBURANTE -->
@@ -524,9 +483,9 @@ textarea{font-size:20px;min-height:70px;}
     </div>
     <!-- Breakdown fusoliera/esterne + KG Misurati -->
     <div id="fuel-compact" style="display:none" class="fuel-compact">
+      <div class="fuel-tag" id="ft-mis-tag" style="display:none;background:rgba(176,120,0,.08);border-color:rgba(176,120,0,.3);"><span class="ft-lbl" style="color:var(--yellow)">KG MISURATI</span><span class="ft-val" id="ft-mis" style="color:var(--yellow)">—</span></div>
       <div class="fuel-tag internal"><span class="ft-lbl">FUSOLIERA</span><span class="ft-val" id="ft-fus">—</span></div>
       <div class="fuel-tag external" id="ft-ext-tag" style="display:none"><span class="ft-lbl" id="ft-ext-lbl">TANICHE</span><span class="ft-val" id="ft-ext">—</span></div>
-      <div class="fuel-tag" id="ft-mis-tag" style="display:none;background:rgba(176,120,0,.08);border-color:rgba(176,120,0,.3);"><span class="ft-lbl" style="color:var(--yellow)">KG MISURATI</span><span class="ft-val" id="ft-mis" style="color:var(--yellow)">—</span></div>
     </div>
     <!-- calc-row rimosso dalla home — valori nascosti -->
     <div style="display:none" id="calc-row-hidden">
@@ -541,24 +500,24 @@ textarea{font-size:20px;min-height:70px;}
   <div class="cblock">
     <div class="gn-grid">
       <div>
-        <div class="gn-item"><div class="gn-lbl">LH GBox</div><button class="gn-btn go" id="gn-gb-sx" onclick="cycleGN('gb-sx')">GO</button></div>
+        <div class="gn-item"><button class="gn-btn go" id="gn-gb-sx" onclick="cycleGN('gb-sx')">GO<span class="gn-sub">LH GBox</span></button></div>
         <div style="height:5px"></div>
-        <div class="gn-item"><div class="gn-lbl">RH GBox</div><button class="gn-btn go" id="gn-gb-dx" onclick="cycleGN('gb-dx')">GO</button></div>
+        <div class="gn-item"><button class="gn-btn go" id="gn-gb-dx" onclick="cycleGN('gb-dx')">GO<span class="gn-sub">RH GBox</span></button></div>
       </div>
       <div>
-        <div class="gn-item"><div class="gn-lbl">GEN 1</div><button class="gn-btn go" id="gn-gen-sx" onclick="cycleGN('gen-sx')">GO</button></div>
+        <div class="gn-item"><button class="gn-btn go" id="gn-gen-sx" onclick="cycleGN('gen-sx')">GO<span class="gn-sub">GEN 1</span></button></div>
         <div style="height:5px"></div>
-        <div class="gn-item"><div class="gn-lbl">GEN 2</div><button class="gn-btn go" id="gn-gen-dx" onclick="cycleGN('gen-dx')">GO</button></div>
+        <div class="gn-item"><button class="gn-btn go" id="gn-gen-dx" onclick="cycleGN('gen-dx')">GO<span class="gn-sub">GEN 2</span></button></div>
       </div>
       <div>
-        <div class="gn-item"><div class="gn-lbl">LH ENG</div><button class="gn-btn go" id="gn-eng-sx" onclick="cycleGN('eng-sx')">GO</button></div>
+        <div class="gn-item"><button class="gn-btn go" id="gn-eng-sx" onclick="cycleGN('eng-sx')">GO<span class="gn-sub">LH ENG</span></button></div>
         <div style="height:5px"></div>
-        <div class="gn-item"><div class="gn-lbl">RH ENG</div><button class="gn-btn go" id="gn-eng-dx" onclick="cycleGN('eng-dx')">GO</button></div>
+        <div class="gn-item"><button class="gn-btn go" id="gn-eng-dx" onclick="cycleGN('eng-dx')">GO<span class="gn-sub">RH ENG</span></button></div>
       </div>
       <div>
-        <div class="gn-item"><div class="gn-lbl">Astina LH</div><button class="gn-btn astina" id="gn-ast-lh" onclick="cycleAstina('ast-lh')">—</button></div>
+        <div class="gn-item"><button class="gn-btn astina" id="gn-ast-lh" onclick="cycleAstina('ast-lh')">—<span class="gn-sub">Ast LH</span></button></div>
         <div style="height:5px"></div>
-        <div class="gn-item"><div class="gn-lbl">Astina RH</div><button class="gn-btn astina" id="gn-ast-rh" onclick="cycleAstina('ast-rh')">—</button></div>
+        <div class="gn-item"><button class="gn-btn astina" id="gn-ast-rh" onclick="cycleAstina('ast-rh')">—<span class="gn-sub">Ast RH</span></button></div>
       </div>
     </div>
   </div>
@@ -576,7 +535,6 @@ textarea{font-size:20px;min-height:70px;}
         <div class="hyd-wrap"><input type="text" id="f-hyd-dx" onfocus="onFieldFocus('f-hyd-dx')" placeholder="00.0" inputmode="decimal" onkeydown="if(event.key==='Enter'){event.preventDefault();doJump();}" oninput="checkHyd('f-hyd-dx');autoJump(this,3)"><span class="hyd-unit">L</span></div>
       </div>
     </div>
-    <div class="note" style="margin-bottom:5px">HYD: avviso &lt;10.0 rosso · &gt;12.0 arancio</div>
     <div class="field" style="margin-bottom:0">
       <label>PAO</label>
       <input type="text" id="f-pao" onfocus="onFieldFocus('f-pao')" placeholder="0.00" inputmode="decimal" onkeydown="if(event.key==='Enter'){event.preventDefault();doJump();}" oninput="checkPAO();autoJump(this,3)">
@@ -634,6 +592,52 @@ textarea{font-size:20px;min-height:70px;}
           <label>RH Hip</label>
           <input type="text" id="f-hip-rh" onfocus="onFieldFocus('f-hip-rh')" placeholder="00000" inputmode="numeric" maxlength="5" onkeydown="if(event.key==='Enter'){event.preventDefault();doJump();}" oninput="autoJump(this,5)">
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="vsep"></div>
+  <div class="cblock">
+    <div class="field" style="margin-bottom:0">
+      <label>Maintenance</label>
+      <div class="opt-pill-row">
+        <button class="opt-pill" id="opt-AMC"   onclick="cycleOpt('AMC')">AMC</button>
+        <button class="opt-pill" id="opt-134"   onclick="cycleOpt('134')">134</button>
+        <button class="opt-pill" id="opt-265"   onclick="cycleOpt('265')">256</button>
+        <button class="opt-pill" id="opt-Para"  onclick="cycleOpt('Para')">Para</button>
+        <button class="opt-pill" id="opt-Ruota" onclick="cycleOpt('Ruota')">Ruota</button>
+        <button class="opt-pill" id="opt-BSD"   onclick="cycleOpt('BSD')">BSD</button>
+      </div>
+      <!-- Legatura: solo BIPO -->
+      <div class="cond" id="legatura-row" style="margin-top:6px;display:none;">
+        <label style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px;">Legatura</label>
+        <div style="display:flex;gap:5px;">
+          <button class="opt-pill" id="leg-both"  onclick="setLegatura('both')"  style="flex:1;">Both</button>
+          <button class="opt-pill" id="leg-solo"  onclick="setLegatura('solo')"  style="flex:1;">Solo</button>
+          <button class="opt-pill" id="leg-front" onclick="setLegatura('front')" style="flex:1;">Front</button>
+        </div>
+      </div>
+      <!-- Para sub-fields -->
+      <div class="cond" id="para-fields" style="margin-top:5px">
+        <div class="row2">
+          <div class="field" style="margin-bottom:0">
+            <label>Para — Rimosso</label>
+            <input type="text" id="f-para-rim" placeholder="—" autocomplete="off" oninput="saveParaSerial()">
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>Para — Installato</label>
+            <input type="text" id="f-para-inst" placeholder="—" autocomplete="off" oninput="saveParaSerial()">
+          </div>
+        </div>
+      </div>
+      <!-- Ruota sub-fields -->
+      <div class="cond" id="ruota-fields" style="margin-top:5px">
+        <div class="mlg-row">
+          <button class="mlg-pill" id="mlg-NLG"   onclick="toggleMLG('NLG')">NLG</button>
+          <button class="mlg-pill" id="mlg-LHMLG" onclick="toggleMLG('LHMLG')">LH MLG</button>
+          <button class="mlg-pill" id="mlg-RHMLG" onclick="toggleMLG('RHMLG')">RH MLG</button>
+        </div>
+        <div id="ruota-sub-rows"></div>
       </div>
     </div>
   </div>
@@ -893,7 +897,7 @@ let seatConfig   = 'mono';
 let seatForzato  = false; // true se l'utente ha cliccato manualmente MONO o BIPO
 
 // Lista carrozzelle BIPO — aggiungerne altre qui
-const BIPO_LIST = ['4-24','4-30','4-31','4-33'];
+const BIPO_LIST = ['4-24','4-26','4-27','4-28','4-30','4-31','4-33','4-34'];
 
 function checkCarrBipo(carrVal){
   // Normalizza: rimuovi spazi, maiuscolo
@@ -2086,7 +2090,7 @@ function resetForm(){
 // ══════════════════════════════════════════
 //  APP CONSTANTS
 // ══════════════════════════════════════════
-const APP_VER = '3.8';
+const APP_VER = '4.1';
 const APP_BASE_URL= 'https://qra4efa.github.io/flightlog/';
 
 // ══════════════════════════════════════════
@@ -2387,12 +2391,19 @@ function focusFlowField(id){
 
 // Quando l'utente tocca manualmente un campo durante il flow,
 // aggiorna _lastFlowId e _flowIdx così il jump riparte da lì
+let _flowSuspended = false;
 function onFieldFocus(id){
   // Se si torna su carrozzella, reimposta seatForzato=false e ricontrolla
   if(id==='f-carr'){
     seatForzato = false;
     const el=document.getElementById('f-carr');
     if(el && el.value.length>=3) applyCarrAutoSeat();
+  }
+  // Sospendi il flow se l'utente tocca manualmente f-tot o f-litri
+  if(id==='f-tot' || id==='f-litri'){
+    _flowSuspended = true;
+  } else {
+    _flowSuspended = false;
   }
   const list = getFullFlow();
   const idx = list.indexOf(id);
@@ -2487,6 +2498,7 @@ const FIELD_MAXLEN = {
 
 // ── Auto-jump al raggiungimento del numero massimo di caratteri ──
 function autoJump(el, maxLen){
+  if(_flowSuspended) return;  // utente su f-tot o f-litri: non avanzare
   const digits = el.value.replace(/[^0-9]/g,'');
   // Usa la matrice centralizzata se disponibile, altrimenti il parametro passato
   let effective = FIELD_MAXLEN[el.id] !== undefined ? FIELD_MAXLEN[el.id] : maxLen;
@@ -2518,6 +2530,17 @@ function doJumpBack(){
 }
 
 function doJump(){
+  // Se il flow era sospeso (utente su f-tot o f-litri), riprendi dal campo corrente
+  if(_flowSuspended){
+    _flowSuspended = false;
+    // Trova il campo attivo in quel momento come punto di partenza
+    const active = document.activeElement;
+    if(active && active.id && active.id !== _lastFlowId){
+      const list = getFullFlow();
+      const idx = list.indexOf(active.id);
+      if(idx >= 0){ _flowIdx = idx; _lastFlowId = active.id; }
+    }
+  }
   // Se siamo fermi su _tipo (pills illuminate), conferma il tipo attuale e avanza
   if(typeof _awaitingTipo !== 'undefined' && _awaitingTipo){
     _awaitingTipo = false;
