@@ -42,7 +42,7 @@ html{overflow-x:hidden;}body{background:var(--bg);color:var(--text);font-family:
 
 
 /* PAGES */
-.page{display:none;padding:6px 10px 130px;max-width:900px;margin:0 auto;}
+.page{display:none;padding:6px 10px 150px;max-width:900px;margin:0 auto;}
 .page.active{display:block;}
 
 /* SECTION TITLE */
@@ -129,7 +129,7 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 .gn-item{display:flex;flex-direction:column;gap:3px;}
 .gn-lbl{font-size:8px;font-weight:700;letter-spacing:.8px;color:var(--muted);text-transform:uppercase;text-align:center;padding:2px 0;}
 .gn-btn{width:100%;border:none;border-radius:5px;padding:6px 2px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Exo 2',sans-serif;transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.1;}
-.gn-sub{font-size:7px;font-weight:600;letter-spacing:.5px;opacity:.65;text-transform:uppercase;display:block;}
+.gn-sub{font-size:11px;font-weight:700;letter-spacing:1px;opacity:.75;text-transform:uppercase;display:block;white-space:nowrap;}
 .gn-btn.go  {background:rgba(0,232,122,.15);border:1px solid rgba(0,232,122,.3);color:var(--green);}
 .gn-btn.astina.nogo{background:rgba(255,32,64,.18);color:var(--red);border-color:rgba(255,32,64,.4);}
 .gn-btn.nogo{background:rgba(255,32,64,.06);border:1px solid rgba(255,32,64,.15);color:#4a2838;}
@@ -205,16 +205,18 @@ input.fuel-lit{color:var(--yellow)!important;border-color:rgba(255,200,0,.35)!im
 .nav-hidden .bottom-nav{display:none!important;}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:9998;background:var(--panel);
   border-top:1px solid var(--border);padding:3px 8px 5px;max-width:900px;margin:0 auto;}
-.bnav-row{display:flex;gap:5px;margin-bottom:3px;}
-.bnav-row:first-child{min-height:42px;}
-.bnav-row:last-child{margin-bottom:0;min-height:42px;}
+/* griglia 3x2: tutte le celle hanno stessa larghezza e stessa altezza */
+.bottom-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:1fr;gap:3px 5px;}
+.bnav-row{display:contents;}
 .bnav-tab{flex:1;border:none;background:var(--bg);color:var(--muted);font-family:'Exo 2',sans-serif;
   font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;
   transition:all .15s;border:1px solid var(--border);border-radius:7px;padding:4px 3px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
-  line-height:1.1;}
+  line-height:1.1;min-height:42px;min-width:0;}
 .bnav-row:first-child 
 .bnav-tab.active{background:rgba(0,212,240,.15);color:var(--accent);border-color:var(--accent);}
+.bnav-tab.bnav-jump{background:#c9f3dc;border-color:#7fd9a8;color:#0a5c38;}
+body.dark .bnav-tab.bnav-jump{background:rgba(0,232,122,.2);border-color:rgba(0,232,122,.45);color:var(--green);}
 .bnav-tab .badge{background:var(--accent);color:#000;border-radius:10px;font-size:8px;font-weight:900;padding:1px 4px;}
 
 /* ── JUMP BUTTON (fixed top-right, posizione fissa) ── */
@@ -300,10 +302,8 @@ body.dark .preview-block b{color:#fff;}
 .vsep{height:1px;background:var(--border);margin:4px 0;opacity:.5;}
 .cblock{padding:5px 0;}
 
-.bnav-tab .bnav-ico{font-size:16px;line-height:1;}
-.bnav-tab .bnav-lbl{font-size:10px;letter-spacing:.5px;}
-.bnav-row:first-child .bnav-tab .bnav-ico{font-size:18px;}
-.bnav-row:first-child .bnav-tab .bnav-lbl{font-size:11px;}
+.bnav-tab .bnav-ico{font-size:18px;line-height:1;}
+.bnav-tab .bnav-lbl{font-size:11px;letter-spacing:.5px;}
 
 /* HYD, PAO, OXY: +2px */
 #f-hyd-sx,#f-hyd-dx,#f-pao,#f-oxy-fwd,#f-oxy-fwd-b,#f-oxy-aft{font-size:22px!important;}
@@ -344,7 +344,7 @@ textarea{font-size:20px;min-height:70px;}
 /* GO/NOGO grid */
 .gn-lbl{font-size:10px;letter-spacing:1px;}
 .gn-btn{font-size:19px;padding:8px 2px;border-radius:6px;}
-.gn-sub{font-size:8px;}
+.gn-sub{font-size:13px;}
 
 /* HYD unit label */
 .hyd-unit{font-size:11px;}
@@ -364,13 +364,9 @@ textarea{font-size:20px;min-height:70px;}
 .ibox strong{font-size:16px;}
 
 /* Bottom nav */
-.bnav-row:first-child{min-height:48px;}
-.bnav-row:last-child{min-height:48px;}
-.bnav-tab{font-size:12px;}
-.bnav-tab .bnav-ico{font-size:17px;}
-.bnav-tab .bnav-lbl{font-size:11px;}
-.bnav-row:first-child .bnav-tab .bnav-ico{font-size:21px;}
-.bnav-row:first-child .bnav-tab .bnav-lbl{font-size:13px;}
+.bnav-tab{font-size:12px;min-height:48px;}
+.bnav-tab .bnav-ico{font-size:21px;}
+.bnav-tab .bnav-lbl{font-size:13px;}
 
 /* Archivio items */
 .arch-date{font-size:13px;}
@@ -459,7 +455,7 @@ input[type=range].fb-range{width:100%;margin:10px 0 2px;accent-color:var(--accen
 
 <div class="app-headline" style="display:flex;align-items:center;justify-content:center;gap:8px;">
   <img src="data:image/jpeg;base64,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" alt="logo" style="width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;">
-  <span>Consumabili EFA — skappa <span class="ver">5.8</span></span>
+  <span>Consumabili EFA — skappa <span class="ver">6.0</span></span>
   <button class="settings-btn" id="settings-btn" onclick="showPage('settings')" aria-label="Impostazioni" title="Impostazioni">&#9881;</button>
 </div>
 
@@ -589,6 +585,11 @@ input[type=range].fb-range{width:100%;margin:10px 0 2px;accent-color:var(--accen
       </div>
     </div>
     <div class="oxy-pao-row">
+      <div class="field" style="margin-bottom:0">
+        <label>PAO</label>
+        <input type="text" id="f-pao" onfocus="onFieldFocus('f-pao')" placeholder="0.00" inputmode="decimal" onkeydown="if(event.key==='Enter'){event.preventDefault();doJump();}" oninput="checkPAO();autoJump(this,3)">
+        <div class="o2-alert" id="pao-alert">⚠ fuori range 0,37–1,03</div>
+      </div>
       <div class="field" id="oxy-mono-wrap" style="margin-bottom:0">
         <label>OXY</label>
         <input type="text" id="f-oxy-fwd" onfocus="onFieldFocus('f-oxy-fwd')" placeholder="0" inputmode="decimal" onkeydown="if(event.key==='Enter'){event.preventDefault();doJump();}" oninput="checkOxy('f-oxy-fwd','oxy-alert-fwd');autoJump(this,3)">
@@ -605,11 +606,6 @@ input[type=range].fb-range{width:100%;margin:10px 0 2px;accent-color:var(--accen
           <input type="text" id="f-oxy-aft" onfocus="onFieldFocus('f-oxy-aft')" placeholder="0" inputmode="decimal" onkeydown="if(event.key==='Enter'){event.preventDefault();doJump();}" oninput="checkOxy('f-oxy-aft','oxy-alert-aft');autoJump(this,3)">
           <div class="o2-alert" id="oxy-alert-aft">⚠ &lt; 200 L</div>
         </div>
-      </div>
-      <div class="field" style="margin-bottom:0">
-        <label>PAO</label>
-        <input type="text" id="f-pao" onfocus="onFieldFocus('f-pao')" placeholder="0.00" inputmode="decimal" onkeydown="if(event.key==='Enter'){event.preventDefault();doJump();}" oninput="checkPAO();autoJump(this,3)">
-        <div class="o2-alert" id="pao-alert">⚠ fuori range 0,37–1,03</div>
       </div>
     </div>
   </div>
@@ -2437,7 +2433,7 @@ function resetForm(){
 // ══════════════════════════════════════════
 //  APP CONSTANTS
 // ══════════════════════════════════════════
-const APP_VER = '5.8';
+const APP_VER = '6.0';
 const APP_BASE_URL= 'https://qra4efa.github.io/flightlog/';
 
 // ══════════════════════════════════════════
