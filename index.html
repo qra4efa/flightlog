@@ -435,8 +435,9 @@ textarea{font-size:20px;min-height:70px;}
 .set-btn:active{opacity:.7;}
 input[type=range].fb-range{width:100%;margin:10px 0 2px;accent-color:var(--accent);height:28px;}
 /* RABBOCCO (v6.2): KG Totale in rosso chiaro + scritta sotto il campo */
-.fuel-rabb{position:absolute;left:0;right:0;top:100%;margin-top:3px;padding:2px 4px;text-align:center;}
-.row3.has-rabb{margin-bottom:26px!important;}
+.o2-alert.fuel-rabb{position:absolute;left:0;right:0;top:auto;bottom:3px;margin:0;padding:0;text-align:center;pointer-events:none;}
+.o2-alert.fuel-rabb.red{background:none;border:none;font-size:9px;line-height:1;letter-spacing:1.2px;color:var(--red);}
+input.fuel-tot.rabbocco{box-sizing:border-box;height:48px;padding-top:2px!important;padding-bottom:13px!important;}
 input.fuel-tot.rabbocco{background:rgba(255,32,64,.14)!important;border-color:var(--red)!important;color:var(--red)!important;}
 </style>
 
@@ -462,7 +463,7 @@ input.fuel-tot.rabbocco{background:rgba(255,32,64,.14)!important;border-color:va
 
 <div class="app-headline" style="display:flex;align-items:center;justify-content:center;gap:8px;">
   <img src="data:image/jpeg;base64,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" alt="logo" style="width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;">
-  <span>Consumabili EFA — skappa <span class="ver">6.4</span></span>
+  <span>Consumabili EFA — skappa <span class="ver">6.5</span></span>
   <button class="settings-btn" id="settings-btn" onclick="showPage('settings')" aria-label="Impostazioni" title="Impostazioni">&#9881;</button>
 </div>
 
@@ -772,6 +773,22 @@ input.fuel-tot.rabbocco{background:rgba(255,32,64,.14)!important;border-color:va
       <div class="note" id="fb-note"></div>
     </div>
 
+    <div class="stitle">Rabbocco</div>
+    <div class="card">
+      <div class="set-row">
+        <div>
+          <div class="set-lbl">Segnalazione rabbocco</div>
+          <div class="set-sub">KG Totale in rosso + scritta RABBOCCO quando manca carburante rispetto al massimo</div>
+        </div>
+        <button type="button" class="sw on" id="sw-rabb" role="switch" aria-checked="true" aria-label="Rabbocco" onclick="toggleRabb()"><i></i></button>
+      </div>
+      <div class="set-row" style="display:block;">
+        <div class="set-lbl">KG sotto il massimo (default 300)</div>
+        <input type="number" id="rabb-kg" inputmode="numeric" min="0" max="2000" step="10" value="300" onchange="rabbKgChange(this.value)" style="width:100%;margin-top:6px;" aria-label="KG sotto il massimo">
+        <div class="set-sub" style="margin-top:6px;">Soglia = massimo teorico − questo valore. Es. monoposto 2 taniche (max 6560): rabbocco sotto 6260. Massimi: mono 5000 · bipo 4300 · +780 per tanica.</div>
+      </div>
+    </div>
+
     <div class="stitle">Applicazione</div>
     <div class="card">
       <div id="set-app"></div>
@@ -997,8 +1014,8 @@ const FUS_BIPO   = 4300;
 const FUS_MONO_MAX = 5000;   // monoposto, fusoliera (nominale 4900-5000)
 const FUS_BIPO_MAX = 4300;   // biposto, fusoliera (nominale 4200-4300)
 const TANK_MAX     = 780;    // tanica esterna (nominale 750)
-const RABB_PRACT   = 30;     // kg tolti al massimo teorico -> massimo PRATICO
-const RABB_MARGIN  = 200;    // kg sotto il massimo pratico oltre i quali compare "RABBOCCO"
+const RABB_DEF     = 300;    // default: kg che devono MANCARE al massimo teorico per attivare "RABBOCCO"
+let   _rabbCfg     = {on:true, kg:RABB_DEF};   // configurabile in Impostazioni (efa_rabb_on / efa_rabb_kg)
 const FUEL_DENS  = 0.78;
 const SCARTO_MAX = 2.0;
 
@@ -1670,11 +1687,11 @@ function calcFuel(){
 }
 
 // RABBOCCO — massimo teorico della configurazione = fusoliera_max + n x 780 kg (n = 0..3).
-// Massimo PRATICO = teorico - RABB_PRACT (i teorici si raggiungono solo con carburante freddissimo/denso).
+// Soglia = massimo teorico - _rabbCfg.kg (default 300; es. mono 2 taniche: 6560-300 = sotto 6260).
 // Le taniche si inferiscono dai KG totali col MINIMO NECESSARIO: il numero più piccolo di taniche
 // il cui massimo teorico contiene il totale. Ogni valore ricade quindi in una configurazione e il
 // controllo funziona con 0, 1, 2 e 3 taniche.
-// Se i KG totali sono più di RABB_MARGIN kg SOTTO il massimo pratico -> campo rosso chiaro + "RABBOCCO".
+// Funzione disattivabile in Impostazioni. Sotto soglia -> campo rosso chiaro + "RABBOCCO" dentro il riquadro.
 // Si valuta solo da 1000 kg in su, per non lampeggiare mentre si digita.
 function rabbTanks(tot, fusMax){
   for(let n=0;n<3;n++){ if(tot <= fusMax + n*TANK_MAX) return n; }
@@ -1688,8 +1705,7 @@ function checkRabbocco(tot){
   if(tot>=1000){
     const fusMax=seatConfig==='bipo'?FUS_BIPO_MAX:FUS_MONO_MAX;
     const n=rabbTanks(tot,fusMax);
-    const maxPratico=fusMax+n*TANK_MAX-RABB_PRACT;
-    rabb = tot < maxPratico - RABB_MARGIN;
+    rabb = _rabbCfg.on && tot < fusMax+n*TANK_MAX - _rabbCfg.kg;
   }
   const fld=inp?inp.closest('.field'):null;
   const vis=!!fld && fld.style.display!=='none';     // campo visibile (non in After Flight)
@@ -2480,7 +2496,7 @@ function resetForm(){
 // ══════════════════════════════════════════
 //  APP CONSTANTS
 // ══════════════════════════════════════════
-const APP_VER = '6.4';
+const APP_VER = '6.5';
 const APP_BASE_URL= 'https://qra4efa.github.io/flightlog/';
 
 // ══════════════════════════════════════════
@@ -2656,6 +2672,31 @@ function fbLoad(){
     const m = parseInt(localStorage.getItem('efa_fb_ms'), 10);
     if(!isNaN(m)) _fbCfg.ms = Math.min(200, Math.max(20, m));
   }catch(e){}
+}
+function rabbLoad(){
+  try{
+    _rabbCfg.on = localStorage.getItem('efa_rabb_on') !== '0';
+    const k = parseInt(localStorage.getItem('efa_rabb_kg'),10);
+    if(!isNaN(k)) _rabbCfg.kg = Math.min(2000, Math.max(0, k));
+  }catch(e){}
+}
+function _rabbSyncUI(){
+  const b=document.getElementById('sw-rabb');
+  if(b){ b.classList.toggle('on',_rabbCfg.on); b.setAttribute('aria-checked',_rabbCfg.on?'true':'false'); }
+  const i=document.getElementById('rabb-kg');
+  if(i){ if(document.activeElement!==i) i.value=_rabbCfg.kg; i.disabled=!_rabbCfg.on; }
+}
+function toggleRabb(){
+  _rabbCfg.on=!_rabbCfg.on;
+  try{ localStorage.setItem('efa_rabb_on',_rabbCfg.on?'1':'0'); }catch(e){}
+  _rabbSyncUI(); checkRabbocco(parseFloat(document.getElementById('f-tot').value)||0);
+}
+function rabbKgChange(v){
+  let k=parseInt(v,10); if(isNaN(k)) k=RABB_DEF;
+  k=Math.min(2000,Math.max(0,k)); _rabbCfg.kg=k;
+  try{ localStorage.setItem('efa_rabb_kg',String(k)); }catch(e){}
+  const i=document.getElementById('rabb-kg'); if(i) i.value=k;
+  checkRabbocco(parseFloat(document.getElementById('f-tot').value)||0);
 }
 function fbReset(){ _fbSkipNext = true; _fbPrevPos = -1; }
 
@@ -3615,6 +3656,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   // showPage hides it on non-form pages
   applyTheme();
   fbLoad();
+  rabbLoad();
   attachBgSave();
   // Auto-load: cerca il record modificato più di recente (max id = timestamp)
   if(archivio.length>0){
@@ -3702,6 +3744,7 @@ function renderDocMgmt(){
 // Apre/aggiorna la pagina Impostazioni (chiamata da showPage('settings'))
 function renderSettings(){
   _fbSyncUI();
+  _rabbSyncUI();
   const v=document.getElementById('set-ver'); if(v) v.textContent=APP_VER;
   _updateThemeBtn();
   renderDocMgmt();
