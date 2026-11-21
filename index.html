@@ -452,6 +452,11 @@ input.fuel-tot.rabbocco{box-sizing:border-box;height:48px;padding-top:2px!import
 .opt-pill.st-ok  .op-sub .a{color:var(--green);font-weight:800;font-size:15px;}
 .opt-pill.st-off .op-sub .b{color:var(--red);font-weight:800;font-size:15px;}
 .opt-pill.st-ok  .op-sub,.opt-pill.st-off .op-sub{color:var(--muted);}
+/* Bordi campi di compilazione (v7.5): vuoto = neutro; compilato = marcato; con il cursore = lampeggia arancione/rosso */
+@keyframes fldBlink{0%,100%{box-shadow:0 0 0 3px rgba(255,150,0,.85);}50%{box-shadow:0 0 0 3px rgba(255,32,64,.25);}}
+input.trk:not(.filled):not(:focus),textarea.trk:not(.filled):not(:focus){border-color:var(--border)!important;box-shadow:none!important;}
+input.trk.filled:not(:focus),textarea.trk.filled:not(:focus){border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
+input.trk:focus,textarea.trk:focus{border-color:var(--orange)!important;animation:fldBlink .9s ease-in-out infinite;}
 /* Note libere: campo più basso */
 #f-note{min-height:44px;height:48px;resize:none;overflow:hidden;}
 input.fuel-tot.rabbocco{background:rgba(255,32,64,.14)!important;border-color:var(--red)!important;color:var(--red)!important;}
@@ -479,7 +484,7 @@ input.fuel-tot.rabbocco{background:rgba(255,32,64,.14)!important;border-color:va
 
 <div class="app-headline" style="display:flex;align-items:center;justify-content:center;gap:8px;">
   <img src="data:image/jpeg;base64,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" alt="logo" style="width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;">
-  <span>Consumabili EFA — skappa <span class="ver">7.4</span></span>
+  <span>Consumabili EFA — by skappa <span class="ver">7.5</span></span>
   <button class="settings-btn" id="settings-btn" onclick="showPage('settings')" aria-label="Impostazioni" title="Impostazioni">&#9881;</button>
 </div>
 
@@ -845,6 +850,7 @@ input.fuel-tot.rabbocco{background:rgba(255,32,64,.14)!important;border-color:va
     </div>
 
     <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:1px;">Consumabili EFA · v<span id="set-ver"></span></div>
+    <div style="text-align:center;font-family:'Exo 2',sans-serif;font-size:34px;font-weight:900;letter-spacing:3px;color:var(--accent);margin:18px 0 26px;">by SKAPPA</div>
   </div>
   <div style="position:fixed;bottom:0;left:0;right:0;z-index:9998;background:var(--panel);border-top:1px solid var(--border);padding:6px 14px 8px;">
     <button onclick="showPage('form')"
@@ -998,16 +1004,7 @@ input.fuel-tot.rabbocco{background:rgba(255,32,64,.14)!important;border-color:va
     <button id="share-main-btn" class="btn btn-primary" style="width:100%;font-size:13px;font-weight:900;letter-spacing:1.5px;padding:15px" onclick="shareText()">
       ✈ CONDIVIDI SCHEDA
     </button>
-    <div style="font-size:9px;color:var(--muted);text-align:center;margin:5px 0 12px;letter-spacing:.5px;">
-      Testo leggibile — funziona su WhatsApp, email, SMS
-    </div>
-
-    <!-- RIGA 2: bottoni secondari JSON + HTML -->
-    <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Strumenti colleghi con app</div>
-    <div style="display:flex;gap:7px;">
-      
-      
-    </div>
+    <div style="height:12px;"></div>
 
     <!-- Area JSON espandibile -->
     <div id="share-json-display" style="display:none;margin-top:10px">
@@ -2582,7 +2579,7 @@ function resetForm(){
 // ══════════════════════════════════════════
 //  APP CONSTANTS
 // ══════════════════════════════════════════
-const APP_VER = '7.4';
+const APP_VER = '7.5';
 const APP_BASE_URL= 'https://qra4efa.github.io/flightlog/';
 
 // ══════════════════════════════════════════
@@ -2855,6 +2852,29 @@ function _tone(freq, dur, when){
   g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
   o.connect(g); g.connect(c.destination);
   o.start(t0); o.stop(t0 + dur + 0.02);
+}
+
+// Tono con glissando (inizio -> fine) per i segnali "modulati"
+function _chirp(f0, f1, dur, when){
+  const c = _getACtx(); if(!c) return;
+  if(c.state === 'suspended'){ c.resume().catch(()=>{}); }
+  const t0 = c.currentTime + (when||0);
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(f0, t0);
+  o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.28, t0 + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(t0); o.stop(t0 + dur + 0.02);
+}
+// Fine compilazione + salvataggio automatico: 3 impulsi brevi, ciascuno più acuto e con glissando ascendente
+function fbDone(){
+  if(!_fbCfg.beep) return;
+  _chirp( 880, 1000, 0.09, 0);
+  _chirp(1100, 1250, 0.09, 0.15);
+  _chirp(1400, 1700, 0.12, 0.30);
 }
 
 function fbPlay(dir){
@@ -3314,6 +3334,17 @@ function nextFlowId(cur){
   sched();
 })();
 
+// ── Evidenziazione bordi: .trk = campo tracciato, .filled = compilato ──
+const TRK_IDS=['f-carr','f-res','f-tot','f-litri','f-hyd-sx','f-hyd-dx','f-pao','f-oxy-fwd','f-oxy-fwd-b','f-oxy-aft','f-gbox-sx','f-gbox-dx','f-apu','f-hip-lh','f-hip-rh','f-note'];
+function refreshFilled(){
+  TRK_IDS.forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.toggle('filled', String(el.value||'').trim()!==''); });
+}
+TRK_IDS.forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.add('trk'); });
+document.addEventListener('input',refreshFilled,true);
+document.addEventListener('change',refreshFilled,true);
+setInterval(refreshFilled,400);   // copre i valori impostati da codice (ereditarietà OXY, caricamento, calcoli)
+refreshFilled();
+
 // ── Tap sui campi: interrompe il flow automatico; primo tap = cursore dopo l'ultima cifra ──
 // Dal secondo tap (campo già in focus) il cursore si sposta liberamente.
 // f-tot / f-litri hanno già il caret a destra via attributi inline.
@@ -3420,6 +3451,7 @@ function doJump(){
     // End of flow: auto-save
     silentSave();
     showToast('\u2705 Consumabili salvati',1200);
+    fbDone();
     _flowMode='off'; _vsTok++;     // compilazione conclusa: resta dov'è, niente ritorno a carrozzella
   }
 }
