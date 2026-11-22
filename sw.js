@@ -3,7 +3,7 @@
 // Quando c'è rete → scarica sempre la versione più recente
 // Senza rete → serve dalla cache
 
-const CACHE_NAME = 'consumabili-efa-v8.3';
+const CACHE_NAME = 'consumabili-efa-v8.4';
 
 const URLS_TO_CACHE = [
   '/flightlog/',
