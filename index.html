@@ -455,10 +455,10 @@ input.fuel-tot.rabbocco{box-sizing:border-box;height:48px;padding-top:2px!import
 input.trk,textarea.trk{touch-action:manipulation;}
 /* Avanti: etichetta stato jump (JUMP AUTO / JUMP OFF) e pressione lunga */
 .bnav-tab{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
-.bnav-jlbl{display:block;font-size:8px;line-height:1;letter-spacing:.6px;margin-bottom:1px;min-height:9px;white-space:nowrap;}
-.bnav-jlbl.on{font-size:9.5px;font-weight:900;color:#0a7a45;}
-body.dark .bnav-jlbl.on{color:var(--green);}
-.bnav-jlbl.off{font-weight:500;color:#7a8a96;}
+.bnav-tab .bnav-jlbl{display:block;line-height:1;margin-bottom:1px;min-height:10px;white-space:nowrap;}
+.bnav-tab .bnav-jlbl.on{font-weight:900;color:#0a7a45;}      /* stessa dimensione della label "Avanti" */
+body.dark .bnav-tab .bnav-jlbl.on{color:var(--green);}
+.bnav-tab .bnav-jlbl.off{font-size:9px;font-weight:500;color:#7a8a96;}
 .bnav-jump.holding .bnav-ico{transform:scale(1.25);transition:transform 1.3s linear;}
 .bnav-jump .bnav-ico{transition:transform .15s;}
 @keyframes fldBlink{0%,100%{border-color:var(--border);box-shadow:none;}50%{border-color:var(--orange);box-shadow:0 0 0 2px rgba(255,140,0,.55);}}
@@ -495,7 +495,7 @@ input.fuel-tot.rabbocco:not(:focus){border-color:var(--red)!important;}
 
 <div class="app-headline" style="display:flex;align-items:center;justify-content:center;gap:8px;">
   <img src="data:image/jpeg;base64,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" alt="logo" style="width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;">
-  <span>Consumabili EFA — by skappa <span class="ver">8.2</span></span>
+  <span>Consumabili EFA — by skappa <span class="ver">8.3</span></span>
   <button class="settings-btn" id="settings-btn" onclick="showPage('settings')" aria-label="Impostazioni" title="Impostazioni">&#9881;</button>
 </div>
 
@@ -2592,7 +2592,7 @@ function resetForm(){
 // ══════════════════════════════════════════
 //  APP CONSTANTS
 // ══════════════════════════════════════════
-const APP_VER = '8.2';
+const APP_VER = '8.3';
 const APP_BASE_URL= 'https://qra4efa.github.io/flightlog/';
 
 // ══════════════════════════════════════════
@@ -2611,7 +2611,7 @@ function showToast(msg, dur=1400){
 function silentSave(){
   gcTrack('/salva-scheda', 'Salvataggio scheda');
   const d=collectData();
-  if(!d.carr||!d.tipo) return;
+  if(!d.carr||!d.tipo) return false;
   document.body.classList.add('blink-off');   // salvato: il lampeggio del campo attivo si ferma
   d._fp=d.carr+'|'+d.tipo+'|'+d.data+'|'+d.ora;
   d.id=Date.now();
@@ -2645,6 +2645,7 @@ function silentSave(){
       if(n>=4){clearInterval(iv);btn.style.background='';btn.style.color='';}
     },140);
   }
+  return true;
 }
 
 // ══════════════════════════════════════════
@@ -2884,12 +2885,37 @@ function _chirp(f0, f1, dur, when){
   o.connect(g); g.connect(c.destination);
   o.start(t0); o.stop(t0 + dur + 0.02);
 }
-// Fine compilazione + salvataggio automatico: 3 impulsi brevi, ciascuno più acuto e con glissando ascendente
+// Sequenza vibrazione (Android: pattern; iPhone: tick a tempi dati). Rispetta lo switch Vibrazione.
+function _vibSeq(pat, iosAt){
+  if(!_fbCfg.vib) return;
+  if(_isIOS){ iosAt.forEach(t=>setTimeout(()=>iosTick(1),t)); }
+  else if('vibrate' in navigator){ try{ navigator.vibrate(pat); }catch(e){} }
+}
+// SALVATAGGIO (fine compilazione o tasto Salva): 3 impulsi brevi ascendenti con glissando, suono + vibrazione
 function fbDone(){
-  if(!_fbCfg.beep) return;
-  _chirp( 880, 1000, 0.09, 0);
-  _chirp(1100, 1250, 0.09, 0.15);
-  _chirp(1400, 1700, 0.12, 0.30);
+  const p=Math.min(_fbCfg.ms,70);
+  if(_fbCfg.beep){
+    _chirp( 880, 1000, 0.09, 0);
+    _chirp(1100, 1250, 0.09, 0.15);
+    _chirp(1400, 1700, 0.12, 0.30);
+  }
+  _vibSeq([p,80,p,80,p+30],[0,150,300]);
+}
+// NUOVA SCHEDA (tasto Nuovo): sequenza esclusiva, 2 note a "ventaglio" discendente/ascendente + 2 vibrazioni
+function fbNew(){
+  const p=Math.min(_fbCfg.ms,70);
+  if(_fbCfg.beep){
+    _chirp(1300,  700, 0.10, 0);
+    _chirp( 700, 1300, 0.14, 0.15);
+  }
+  _vibSeq([p,70,p*2],[0,130]);
+}
+// Tasto Salva: stessi suoni, vibrazioni e pop-up del salvataggio a fine compilazione
+function saveWithFeedback(){
+  if(silentSave()===false){ showToast('\u26a0 Mancano carrozzella o tipo ispezione',1800); return false; }
+  showToast('\u2705 Consumabili salvati',1200);
+  fbDone();
+  return true;
 }
 
 function fbPlay(dir){
@@ -3482,11 +3508,24 @@ function _initJumpLongPress(){
   const btn=document.getElementById('bnav-jump'); if(!btn) return;
   const LP_MS=1300; let tmr=null;
   const cancel=()=>{ clearTimeout(tmr); tmr=null; btn.classList.remove('holding'); };
-  btn.addEventListener('pointerdown',()=>{
+  const start=()=>{
     _lpFired=false; btn.classList.add('holding');
     tmr=setTimeout(()=>{ tmr=null; btn.classList.remove('holding'); _lpFired=true; toggleJumpAuto(); },LP_MS);
-  });
-  ['pointerup','pointerleave','pointercancel'].forEach(e=>btn.addEventListener(e,cancel));
+  };
+  // TOUCH: preventDefault sul touchstart annulla la pressione lunga nativa del sistema
+  // (su Android dà un'haptic prematura, ~0,5 s). Il tocco breve lo gestiamo noi al touchend.
+  btn.addEventListener('touchstart',e=>{ e.preventDefault(); start(); },{passive:false});
+  btn.addEventListener('touchend',e=>{
+    e.preventDefault();
+    const fired=_lpFired; const pending=(tmr!==null);
+    cancel();
+    if(fired){ _lpFired=false; return; }       // pressione lunga già gestita
+    if(pending) navNext();                      // tocco breve = Avanti
+  },{passive:false});
+  btn.addEventListener('touchcancel',cancel);
+  // MOUSE / puntatore non touch
+  btn.addEventListener('pointerdown',e=>{ if(e.pointerType==='touch') return; start(); });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>btn.addEventListener(ev,e=>{ if(e.pointerType==='touch') return; cancel(); }));
   btn.addEventListener('contextmenu',e=>e.preventDefault());
 }
 // la barra di navigazione sta dopo lo script nel DOM: aggancia a DOM pronto
@@ -3541,9 +3580,7 @@ function doJump(){
     focusFlowField(next);
   } else {
     // End of flow: auto-save
-    silentSave();
-    showToast('\u2705 Consumabili salvati',1200);
-    fbDone();
+    saveWithFeedback();
     _flowMode='off'; _vsTok++;     // compilazione conclusa: resta dov'è, niente ritorno a carrozzella
   }
 }
@@ -4269,14 +4306,14 @@ function closeModal(id){
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <div class="bnav-row">
-    <button class="bnav-tab active" onclick="newForm()" id="tab-form"><span class="bnav-ico">+</span><span class="bnav-lbl">Nuovo</span></button>
+    <button class="bnav-tab active" onclick="fbNew();newForm()" id="tab-form"><span class="bnav-ico">+</span><span class="bnav-lbl">Nuovo</span></button>
     <button class="bnav-tab" onclick="openShare()" id="bnav-share"><span class="bnav-ico">✈</span><span class="bnav-lbl">Condividi<br>Consumabili</span></button>
     <button class="bnav-tab" onclick="navBack()" id="bnav-back"><span class="bnav-ico">◀</span><span class="bnav-lbl">Indietro</span></button>
   </div>
   <div class="bnav-row">
-    <button class="bnav-tab" onclick="silentSave()" id="bnav-save"><span class="bnav-ico">💾</span><span class="bnav-lbl">Salva</span></button>
+    <button class="bnav-tab" onclick="saveWithFeedback()" id="bnav-save"><span class="bnav-ico">💾</span><span class="bnav-lbl">Salva</span></button>
     <button class="bnav-tab" onclick="showPage('archive')" id="tab-archive"><span class="bnav-ico">🗂</span><span class="bnav-lbl">Archivio <span class="badge" id="arch-badge"></span></span></button>
-    <button class="bnav-tab bnav-jump" onclick="navNext()" id="bnav-jump"><span class="bnav-jlbl" id="jump-lbl"></span><span class="bnav-ico">▶</span><span class="bnav-lbl">Avanti</span></button>
+    <button class="bnav-tab bnav-jump" onclick="navNext()" id="bnav-jump"><span class="bnav-lbl bnav-jlbl" id="jump-lbl"></span><span class="bnav-ico">▶</span><span class="bnav-lbl">Avanti</span></button>
   </div>
 </div>
 <div class="toast" id="toast"></div>
